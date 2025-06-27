@@ -26,8 +26,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response = await dio.post(
         ApiConstants.loginEndpoint,
         data: {
-          'email': email,
+          'username': email,
           'password': password,
+          'platform': 'mobile',
         },
       );
 
@@ -55,7 +56,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await dio.post(
         ApiConstants.refreshTokenEndpoint,
-        data: {'refreshToken': refreshToken},
+        data: {'token': refreshToken},
       );
 
       if (response.statusCode == 200) {

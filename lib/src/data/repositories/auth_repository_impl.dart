@@ -1,6 +1,7 @@
 // lib/src/data/repositories/auth_repository_impl.dart
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
@@ -14,9 +15,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, (String, String, User)>> login(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       final authResponse = await remoteDataSource.login(email, password);
+      print(authResponse);
       return Right((
         authResponse.accessToken,
         authResponse.refreshToken,

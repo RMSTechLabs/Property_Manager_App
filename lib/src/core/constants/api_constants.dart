@@ -7,8 +7,8 @@ class ApiConstants {
   //   defaultValue: 'https://api.example.com',
   // );
   
-  static const String loginEndpoint = '/auth/login';
-  static const String refreshTokenEndpoint = '/auth/refresh';
+  static const String loginEndpoint = '/auth/authenticate';
+  static const String refreshTokenEndpoint = '/auth/refresh-token';
   static const String userProfileEndpoint = '/auth/me';
   
   static Duration get connectTimeout => 

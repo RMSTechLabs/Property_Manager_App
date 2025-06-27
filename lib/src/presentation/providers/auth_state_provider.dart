@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:property_manager_app/src/domain/usecases/login_uusecase.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/jwt_decoder_util.dart';
 import '../../core/utils/secure_storage.dart';
 import '../../domain/entities/user.dart';
-
+import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/refresh_token_usecase.dart';
 
