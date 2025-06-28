@@ -1,6 +1,7 @@
 // lib/src/data/datasources/auth_remote_datasource.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:property_manager_app/src/data/models/auth_response_model.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/errors/exceptions.dart';
@@ -17,6 +18,7 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
+  var logger = Logger(printer: PrettyPrinter());
 
   AuthRemoteDataSourceImpl(this.dio);
 
@@ -25,13 +27,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await dio.post(
         ApiConstants.loginEndpoint,
-        data: {
-          'username': email,
-          'password': password,
-          'platform': 'mobile',
-        },
+        data: {'username': email, 'password': password, 'platform': 'mobile'},
       );
-
       if (response.statusCode == 200) {
         return AuthResponseModel.fromJson(response.data);
       } else {
@@ -99,7 +96,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       } else if (e.response?.statusCode == 404) {
         throw ServerException('User not found');
       } else {
-        throw ServerException(e.response?.data['message'] ?? 'Failed to get user profile');
+        throw ServerException(
+          e.response?.data['message'] ?? 'Failed to get user profile',
+        );
       }
     } catch (e) {
       throw ServerException('Unexpected error occurred');
@@ -108,6 +107,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 }
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  final dio = ref.watch(dioProvider);
+  final dio = ref.read(dioProvider);
   return AuthRemoteDataSourceImpl(dio);
 });

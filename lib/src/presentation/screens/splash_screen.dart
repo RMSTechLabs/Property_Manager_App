@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:property_manager_app/src/core/localization/app_localizations.dart';
 import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
+import 'package:property_manager_app/src/presentation/widgets/gradient_text.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -23,21 +25,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
 
     _animationController.forward();
   }
@@ -51,9 +45,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).primaryColorLight,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -65,24 +59,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   scale: _scaleAnimation.value,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.home_work,
-                        size: 80,
-                        color: Colors.blue,
-                      ),
+                    child: Image.asset(
+                      'assets/images/splash.png', // ✅ Make sure the path is correct
+                      width: 150, // or your preferred size
+                      height: 150,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 );
@@ -91,12 +72,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             const SizedBox(height: 30),
             FadeTransition(
               opacity: _fadeAnimation,
-              child: Text(
-                'Property Manager',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              child: GradientText(
+                text: l10n!.appTitle.toUpperCase(),
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  fontSize: 32, // 👈 Set your desired size here
+                  fontWeight: FontWeight.w800,
                 ),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF5A5FFF), Color(0xFFB833F2)],
+                ),
+                textAlign: TextAlign.center,
+                isAnimated: true,
               ),
             ),
             const SizedBox(height: 50),
@@ -111,28 +97,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                authState.isInitialized 
-                  ? 'Signing you in...' 
-                  : 'Initializing...',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+                authState.isInitialized
+                    ? 'Signing you in...'
+                    : 'Initializing...',
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
               ),
             ],
             if (authState.error != null) ...[
-              const Icon(
-                Icons.error_outline,
-                color: Colors.white70,
-                size: 30,
-              ),
+              const Icon(Icons.error_outline, color: Colors.white70, size: 30),
               const SizedBox(height: 16),
               Text(
                 'Initialization failed',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
               ),
             ],
           ],

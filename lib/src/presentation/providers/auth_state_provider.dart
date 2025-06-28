@@ -48,7 +48,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   final LoginUseCase _loginUseCase;
   final LogoutUseCase _logoutUseCase;
   final RefreshTokenUseCase _refreshTokenUseCase;
-  
+
   Timer? _refreshTimer;
   Timer? _periodicRefreshTimer;
 
@@ -67,11 +67,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       // Check if user was previously logged in
       final isLoggedIn = await SecureStorage.isLoggedIn();
       final hasValidRefreshToken = await SecureStorage.hasValidRefreshToken();
-      
+
       if (isLoggedIn && hasValidRefreshToken) {
         // Try to refresh token to get new access token
         final result = await _refreshTokenUseCase();
-        
+
         await result.fold(
           (failure) async {
             // Refresh failed, but keep user logged in state
@@ -108,10 +108,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       } else {
         // Not logged in or refresh token expired
         await SecureStorage.deleteAll();
-        state = state.copyWith(
-          isLoading: false,
-          isInitialized: true,
-        );
+        state = state.copyWith(isLoading: false, isInitialized: true);
       }
     } catch (e) {
       print('Auth initialization error: $e');
@@ -130,13 +127,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
     await result.fold(
       (failure) async {
-        state = state.copyWith(
-          isLoading: false,
-          error: failure.message,
-        );
+        state = state.copyWith(isLoading: false, error: failure.message);
       },
       (data) async {
-        final (accessToken, refreshToken, user) = data;
+        print(data);
+        final (token, refreshToken, user) = data;
 
         // Save persistent data
         await Future.wait([
@@ -147,13 +142,13 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
         state = state.copyWith(
           isAuthenticated: true,
-          accessToken: accessToken,
+          accessToken: token,
           user: user,
           isLoading: false,
           error: null,
         );
 
-        _scheduleTokenRefresh(accessToken);
+        _scheduleTokenRefresh(token);
         _schedulePeriodicRefresh();
       },
     );
@@ -167,10 +162,10 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     // Cancel all timers
     _refreshTimer?.cancel();
     _periodicRefreshTimer?.cancel();
-    
+
     // Call logout API
     await _logoutUseCase();
-    
+
     // Clear all persistent data
     await SecureStorage.deleteAll();
 
@@ -203,7 +198,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   void _schedulePeriodicRefresh() {
     _periodicRefreshTimer?.cancel();
-    
+
     // Refresh every 9 minutes regardless of token expiry
     _periodicRefreshTimer = Timer.periodic(
       AppConstants.refreshInterval,
@@ -219,10 +214,10 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     await result.fold(
       (failure) async {
         print('Token refresh failed: ${failure.message}');
-        
+
         // Check if we still have a valid refresh token
         final hasValidRefreshToken = await SecureStorage.hasValidRefreshToken();
-        
+
         if (!hasValidRefreshToken) {
           // Refresh token expired, logout user
           await _performLogout();
@@ -230,7 +225,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
           // Keep user logged in but without access token
           // They might be offline
           state = state.copyWith(accessToken: null);
-          
+
           // Try again in 1 minute
           Timer(const Duration(minutes: 1), _refreshAccessToken);
         }
@@ -255,12 +250,13 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authStateProvider =
-    StateNotifierProvider<AuthStateNotifier, AuthState>((ref) {
+final authStateProvider = StateNotifierProvider<AuthStateNotifier, AuthState>((
+  ref,
+) {
   return AuthStateNotifier(
-    ref.watch(loginUseCaseProvider),
-    ref.watch(logoutUseCaseProvider),
-    ref.watch(refreshTokenUseCaseProvider),
+    ref.read(loginUseCaseProvider),
+    ref.read(logoutUseCaseProvider),
+    ref.read(refreshTokenUseCaseProvider),
   );
 });
 

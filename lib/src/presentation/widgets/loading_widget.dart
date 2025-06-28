@@ -4,11 +4,7 @@ class LoadingWidget extends StatelessWidget {
   final String? message;
   final bool overlay;
 
-  const LoadingWidget({
-    super.key,
-    this.message,
-    this.overlay = false,
-  });
+  const LoadingWidget({super.key, this.message, this.overlay = false});
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +51,7 @@ class LoadingOverlay extends StatelessWidget {
     return Stack(
       children: [
         child,
-        if (isLoading)
-          LoadingWidget(
-            message: loadingText,
-            overlay: true,
-          ),
+        if (isLoading) LoadingWidget(message: loadingText, overlay: true),
       ],
     );
   }

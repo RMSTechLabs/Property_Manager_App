@@ -25,8 +25,9 @@ class AppLocalizations {
   late Map<String, String> _localizedStrings;
 
   Future<bool> load() async {
-    String jsonString = await rootBundle
-        .loadString('lib/src/core/localization/app_${locale.languageCode}.arb');
+    String jsonString = await rootBundle.loadString(
+      'lib/src/core/localization/app_${locale.languageCode}.arb',
+    );
     Map<String, dynamic> jsonMap = json.decode(jsonString);
 
     _localizedStrings = jsonMap.map((key, value) {
@@ -43,6 +44,7 @@ class AppLocalizations {
   // Common strings
   String get appTitle => translate('app_title');
   String get login => translate('login');
+  String get signIn => translate('Sign In');
   String get logout => translate('logout');
   String get email => translate('email');
   String get password => translate('password');

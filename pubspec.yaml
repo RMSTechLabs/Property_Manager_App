@@ -1,6 +1,6 @@
 name: property_manager_app
 description: "Property Manager App is a Flutter application designed to help users manage their properties efficiently. It provides features for tracking property details, expenses, and maintenance schedules."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
@@ -32,7 +32,6 @@ dependencies:
   redacted: ^1.0.13
   intl: ^0.20.2
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -42,21 +41,21 @@ dev_dependencies:
   mocktail: ^1.0.4
   build_runner: ^2.5.4
 
-
-
 flutter:
   uses-material-design: true
   generate: true
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/images/login.jpg
+    - assets/images/background/Vector1.png
+    - assets/images/background/Vector2.png
     - .env
     - lib/src/core/localization/app_en.arb
     - lib/src/core/localization/app_hi.arb
     - lib/src/core/localization/app_ar.arb
 
-
-# Splash Screen Configuration    
+# Splash Screen Configuration
 flutter_native_splash:
   color: "#F2F5F7"
   image: assets/images/splash.png

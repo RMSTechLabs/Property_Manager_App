@@ -9,13 +9,9 @@ import '../../presentation/providers/auth_state_provider.dart';
 
 class GoRouterRefreshNotifier extends ChangeNotifier {
   GoRouterRefreshNotifier(ProviderContainer container) {
-    container.listen(
-      authStateProvider,
-      (_, __) => notifyListeners(),
-    );
+    container.listen(authStateProvider, (_, __) => notifyListeners());
   }
 }
-
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -43,7 +39,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       print('🔀 current route: ${state.matchedLocation}');
 
       // After initialization, redirect based on auth state
-       if (!isAuthenticated && !isLoginRoute) {
+      if (!isAuthenticated && !isLoginRoute) {
         return '/login';
       }
 

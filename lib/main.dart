@@ -22,11 +22,7 @@ void main() async {
   await _configureSystemUI();
 
   // Run the app with proper error boundary
-  runApp(
-    ProviderScope(
-      child: const PropertyManagerApp(),
-    ),
-  );
+  runApp(ProviderScope(child: const PropertyManagerApp()));
 }
 
 /// Initialize global error handling
@@ -81,7 +77,7 @@ void _logError(String type, Object error, StackTrace? stackTrace) {
   if (stackTrace != null) {
     print('📍 Stack Trace: $stackTrace');
   }
-  
+
   // In production, you would send this to crash reporting service
   // Example: FirebaseCrashlytics.instance.recordError(error, stackTrace);
 }
@@ -124,7 +120,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
       print('✅ App initialization completed successfully');
     } catch (e, stackTrace) {
       _logError('App Initialization Error', e, stackTrace);
-      
+
       // Still mark as initialized to prevent infinite loading
       setState(() {
         _isInitialized = true;
@@ -144,7 +140,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    
+
     switch (state) {
       case AppLifecycleState.resumed:
         print('📱 App resumed');
@@ -206,21 +202,13 @@ class _InitializationScreenState extends State<InitializationScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
 
     _animationController.forward();
   }
@@ -286,10 +274,7 @@ class _InitializationScreenState extends State<InitializationScreen>
               opacity: _fadeAnimation,
               child: const Text(
                 'Initializing...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
             ),
             const SizedBox(height: 32),
@@ -299,7 +284,7 @@ class _InitializationScreenState extends State<InitializationScreen>
               child: CircularProgressIndicator(
                 strokeWidth: 3,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  Colors.white.withOpacity(0.8),
+                  Color.fromRGBO(255, 255, 255, 0.8),
                 ),
               ),
             ),
