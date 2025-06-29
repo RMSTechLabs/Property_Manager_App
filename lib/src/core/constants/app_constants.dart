@@ -23,5 +23,18 @@ class AppConstants {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+  static const LinearGradient secondartGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFF6366F1), // Indigo
+      Color(0xFF8B5CF6), // Purple
+    ],
+  );
   static const Color whiteColor = Color(0xFFF2F4F5);
+  static const Color white50 = Color(0xFFE5E7EB);
+  static const Color black = Color(0xFF1F2937);
+  static const Color black50 = Color(0xFF6B7280);
+  static const Color purple50 = Color(0xFF6366F1);
+  static const Color gray = Color(0xFF6B7280);
 }

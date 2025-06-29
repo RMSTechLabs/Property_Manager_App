@@ -9,7 +9,7 @@ class RefreshTokenResponseModel {
 
   factory RefreshTokenResponseModel.fromJson(Map<String, dynamic> json) {
     return RefreshTokenResponseModel(
-      accessToken: json['accessToken'] ?? json['access_token'] ?? '',
+      accessToken: json['token'] ?? json['access_token'] ?? '',
       expiresIn: json['expiresIn'] ?? json['expires_in'],
     );
   }

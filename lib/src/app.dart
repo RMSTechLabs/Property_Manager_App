@@ -295,7 +295,8 @@ class _AppState extends ConsumerState<App> {
     return ThemeData(
       primarySwatch: customPrimarySwatch,
       useMaterial3: true,
-
+      fontFamily: 'SF Pro Display', // Add to pubspec.yaml
+      visualDensity: VisualDensity.adaptivePlatformDensity, //
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryGradientStart,
         brightness: Brightness.light,
@@ -319,7 +320,9 @@ class _AppState extends ConsumerState<App> {
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
-
+      switchTheme: SwitchThemeData(
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+      ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: primaryGradientEnd,

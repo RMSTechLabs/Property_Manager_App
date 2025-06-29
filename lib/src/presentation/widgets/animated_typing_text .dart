@@ -29,6 +29,7 @@ class _AnimatedTypingTextState extends State<AnimatedTypingText> {
   void _typeText() async {
     while (_index < widget.text.length) {
       await Future.delayed(widget.speed);
+      if (!mounted) return;//
       setState(() {
         _index++;
         _displayedText = widget.text.substring(0, _index);

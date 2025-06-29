@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/localization/app_localizations.dart';
 import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
 import 'package:property_manager_app/src/presentation/widgets/gradient_text.dart';
@@ -16,6 +17,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _minimumTimePassed = false;
 
   @override
   void initState() {
@@ -34,6 +36,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
 
     _animationController.forward();
+
+    // ✅ Delay with safe setState
+    Future.delayed(const Duration(seconds: 10), () {
+      if (mounted) {
+        setState(() {
+          _minimumTimePassed = true;
+        });
+      }
+    });
   }
 
   @override
@@ -78,15 +89,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   fontSize: 32, // 👈 Set your desired size here
                   fontWeight: FontWeight.w800,
                 ),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF5A5FFF), Color(0xFFB833F2)],
-                ),
+                gradient: AppConstants.primaryGradient,
                 textAlign: TextAlign.center,
                 isAnimated: true,
               ),
             ),
             const SizedBox(height: 50),
-            if (authState.isLoading) ...[
+            if (authState.isLoading || !_minimumTimePassed) ...[
               const SizedBox(
                 width: 30,
                 height: 30,

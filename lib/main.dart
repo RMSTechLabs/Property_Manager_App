@@ -113,6 +113,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
       BackgroundTaskHandler.initialize(ref);
 
       // Mark as initialized
+      if (!mounted) return;//
       setState(() {
         _isInitialized = true;
       });
@@ -122,6 +123,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
       _logError('App Initialization Error', e, stackTrace);
 
       // Still mark as initialized to prevent infinite loading
+      if (!mounted) return;//
       setState(() {
         _isInitialized = true;
       });

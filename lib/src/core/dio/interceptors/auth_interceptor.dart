@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../presentation/providers/auth_state_provider.dart';
-import '../../../domain/usecases/refresh_token_usecase.dart';
 import '../../utils/jwt_decoder_util.dart';
 
 class AuthInterceptor extends QueuedInterceptor {

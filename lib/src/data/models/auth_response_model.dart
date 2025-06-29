@@ -7,6 +7,7 @@ class AuthResponseModel {
   final String message;
   final bool success;
   final UserModel user;
+  final bool otpVerified;
 
   AuthResponseModel({
     required this.accessToken,
@@ -14,6 +15,7 @@ class AuthResponseModel {
     required this.user,
     required this.message,
     required this.success,
+    required this.otpVerified,
   });
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class AuthResponseModel {
         user: UserModel.fromJson(data['user'] ?? {}),
         message: json['message'],
         success: json['success'],
+        otpVerified: false,
       );
     } catch (e, stack) {
       print('❌ Error parsing AuthResponseModel: $e\n$stack');
@@ -40,6 +43,7 @@ class AuthResponseModel {
       'user': user.toJson(),
       'success': success,
       'message': message,
+      'otpVerified':otpVerified,
     };
   }
 
@@ -50,6 +54,7 @@ class AuthResponseModel {
     UserModel? user,
     String? message,
     bool? success,
+    bool? otpVerified,
   }) {
     return AuthResponseModel(
       accessToken: accessToken ?? this.accessToken,
@@ -57,12 +62,13 @@ class AuthResponseModel {
       user: user ?? this.user,
       message: message ?? this.message,
       success: success ?? this.success,
+      otpVerified: otpVerified ?? this.otpVerified,
     );
   }
 
   @override
   String toString() {
-    return 'AuthResponseModel(accessToken: $accessToken, refreshToken: $refreshToken, user: $user, message: $message, success: $success)';
+    return 'AuthResponseModel(accessToken: $accessToken, refreshToken: $refreshToken, user: $user, message: $message, success: $success, otpVerified: $otpVerified)';
   }
 
   @override
@@ -74,7 +80,9 @@ class AuthResponseModel {
         other.refreshToken == refreshToken &&
         other.user == user &&
         other.message == message &&
-        other.success;
+        other.success==success &&
+        other.otpVerified==otpVerified
+        ;
   }
 
   @override
@@ -83,6 +91,8 @@ class AuthResponseModel {
         refreshToken.hashCode ^
         user.hashCode ^
         message.hashCode ^
-        success.hashCode;
+        success.hashCode ^
+        otpVerified.hashCode
+        ;
   }
 }

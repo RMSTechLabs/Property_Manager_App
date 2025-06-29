@@ -76,12 +76,12 @@ class AppLocalizations {
   String get error => translate('error');
   String get success => translate('success');
   String get retry => translate('retry');
-  String get noDataFound => translate('no_data_found');
-  String get internetConnectionError => translate('internet_connection_error');
-  String get serverError => translate('server_error');
-  String get invalidCredentials => translate('invalid_credentials');
-  String get invalidEmail => translate('invalid_email');
-  String get invalidPassword => translate('invalid_password');
+  String get noDataFound => translate('no data found');
+  String get internetConnectionError => translate('internet connection error');
+  String get serverError => translate('server error');
+  String get invalidCredentials => translate('invalid credentials');
+  String get invalidEmail => translate('invalid email');
+  String get invalidPassword => translate('invalid password');
 }
 
 class _AppLocalizationsDelegate

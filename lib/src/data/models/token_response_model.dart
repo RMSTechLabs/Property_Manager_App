@@ -11,7 +11,7 @@ class TokenResponseModel {
 
   factory TokenResponseModel.fromJson(Map<String, dynamic> json) {
     return TokenResponseModel(
-      accessToken: json['accessToken'] ?? json['access_token'] ?? '',
+      accessToken: json['token'] ?? json['access_token'] ?? '',
       refreshToken: json['refreshToken'] ?? json['refresh_token'],
       expiresIn: json['expiresIn'] ?? json['expires_in'],
     );

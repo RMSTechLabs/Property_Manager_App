@@ -1,10 +1,14 @@
-// lib/src/presentation/screens/auth/login_screen.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/localization/app_localizations.dart';
 import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
 import 'package:property_manager_app/src/presentation/widgets/gradient_button.dart';
-import 'package:property_manager_app/src/presentation/widgets/gradient_text.dart';
+import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -17,264 +21,544 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _otpController = TextEditingController();
+
   bool _obscurePassword = true;
+  Timer? _otpTimer;
+  int _otpTimeLeft = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Clear any previous auth errors when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authStateProvider.notifier).state = ref
+          .read(authStateProvider)
+          .copyWith(error: null);
+    });
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _otpController.dispose();
+    _otpTimer?.cancel();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      await ref
-          .read(authStateProvider.notifier)
-          .login(_emailController.text.trim(), _passwordController.text);
+  void _startOtpTimer() {
+    _otpTimeLeft = 10; // 2 minutes
+    _otpTimer?.cancel();
+    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          if (_otpTimeLeft > 0) {
+            _otpTimeLeft--;
+          } else {
+            timer.cancel();
+          }
+        });
+      }
+    });
+  }
 
-      // Navigation is handled by router redirect
+  void _stopOtpTimer() {
+    _otpTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _otpTimeLeft = 0;
+      });
     }
   }
 
-  @override
-  // Widget build(BuildContext context) {
-  //   final authState = ref.watch(authStateProvider);
-  //   final l10n = AppLocalizations.of(context);
-  //   ref.listen<AuthState>(authStateProvider, (previous, next) {
-  //     if (next.error != null) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
-  //       );
-  //     }
-  //   });
-  //   return Scaffold(
-  //     // backgroundColor: Theme.of(context).primaryColorLight,
-  //     body: SafeArea(
-  //       child: Center(
-  //         child: SingleChildScrollView(
-  //           padding: const EdgeInsets.all(24.0),
-  //           child: Form(
-  //             key: _formKey,
-  //             child: Column(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               crossAxisAlignment: CrossAxisAlignment.stretch,
-  //               children: [
-  //                 GradientText(
-  //                   text: l10n!.signIn,
-  //                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-  //                     fontSize: 30,
-  //                     fontWeight: FontWeight.w800,
-  //                   ),
-  //                   gradient: const LinearGradient(
-  //                     colors: [Color(0xFF5A5FFF), Color(0xFFB833F2)],
-  //                   ),
-  //                   textAlign: TextAlign.center,
-  //                 ),
-  //                 const SizedBox(height: 10),
-  //                 Text(
-  //                   "Dubai's premier property management platform. Streamline operations, enhance security, and build stronger communities.",
-  //                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-  //                     fontSize: 13,
-  //                     fontWeight: FontWeight.w400,
-  //                     color: Colors.black,
-  //                   ),
-  //                   textAlign: TextAlign.center,
-  //                 ),
-  //                 const SizedBox(height: 48),
-  //                 TextFormField(
-  //                   controller: _emailController,
-  //                   keyboardType: TextInputType.emailAddress,
-  //                   decoration: InputDecoration(
-  //                     labelText: l10n.email,
-  //                     prefixIcon: const Icon(Icons.email),
-  //                     border: const OutlineInputBorder(),
-  //                   ),
-  //                   validator: (value) {
-  //                     if (value == null || value.isEmpty) {
-  //                       return l10n.invalidEmail;
-  //                     }
-  //                     if (!value.contains('@')) {
-  //                       return l10n.invalidEmail;
-  //                     }
-  //                     return null;
-  //                   },
-  //                 ),
-  //                 const SizedBox(height: 16),
-  //                 TextFormField(
-  //                   controller: _passwordController,
-  //                   obscureText: _obscurePassword,
-  //                   decoration: InputDecoration(
-  //                     labelText: l10n.password,
-  //                     prefixIcon: const Icon(Icons.lock),
-  //                     border: const OutlineInputBorder(),
-  //                     suffixIcon: IconButton(
-  //                       icon: Icon(
-  //                         _obscurePassword
-  //                             ? Icons.visibility
-  //                             : Icons.visibility_off,
-  //                       ),
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           _obscurePassword = !_obscurePassword;
-  //                         });
-  //                       },
-  //                     ),
-  //                   ),
-  //                   validator: (value) {
-  //                     if (value == null || value.isEmpty) {
-  //                       return l10n.invalidPassword;
-  //                     }
-  //                     return null;
-  //                   },
-  //                 ),
-  //                 const SizedBox(height: 24),
-  //                 GradientButton(
-  //                   onPressed: authState.isLoading
-  //                       ? null
-  //                       : () => _handleLogin(),
-  //                   label: l10n.login,
-  //                   isLoading: authState.isLoading,
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final l10n = AppLocalizations.of(context);
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    ref.listen<AuthState>(authStateProvider, (previous, next) {
-      if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
-        );
-      }
-    });
+    await ref
+        .read(authStateProvider.notifier)
+        .login(_emailController.text.trim(), _passwordController.text);
+  }
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColorLight,
-      body: Stack(
-        children: [
-          // Yellow blob background
-          Positioned(
-            top: -20,
-            left: -100,
-            child: Image.asset(
-              'assets/images/background/Vector1.png',
-              width: 300,
-              height: 300,
+  Future<void> _handleOtpVerification() async {
+    final otp = _otpController.text.trim();
+    if (otp.length != 6) {
+      AppSnackBar.showError(
+        context: context,
+        message: 'Please enter a valid 6-digit OTP',
+      );
+      return;
+    }
+    await ref.read(authStateProvider.notifier).validateOtp(otp.toString());
+  }
+
+  Future<void> _handleResendOtp() async {
+    _otpController.clear();
+    await ref.read(authStateProvider.notifier).resendOtp();
+  }
+
+  Widget _buildLoginForm(AppLocalizations? l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Email Field
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Email Address",
+              style: TextStyle(
+                fontSize: 14,
+                color: AppConstants.black50,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          Positioned(
-            bottom: -70,
-            right: -90,
-            child: Image.asset(
-              'assets/images/background/Vector2.png',
-              width: 300,
-              height: 300,
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                hintText: "Enter your email",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppConstants.purple50,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email address';
+                }
+                if (!RegExp(
+                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                ).hasMatch(value)) {
+                  return l10n?.invalidEmail ?? 'Invalid email';
+                }
+                return null;
+              },
             ),
-          ),
+          ],
+        ),
+        const SizedBox(height: 20),
 
-          // Login form on top
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      GradientText(
-                        text: l10n!.signIn,
-                        style: Theme.of(context).textTheme.headlineMedium!
-                            .copyWith(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w800,
+        // Password Field
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Password",
+              style: TextStyle(
+                fontSize: 14,
+                color: AppConstants.black50,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _handleLogin(),
+              decoration: InputDecoration(
+                hintText: "Enter your password",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppConstants.purple50,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: AppConstants.gray,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                if (value.length < 6) {
+                  return 'Password must be at least 6 characters';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtpForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Email Display (Read-only)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Email Address",
+              style: TextStyle(
+                fontSize: 14,
+                color: AppConstants.black50,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppConstants.white50),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _emailController.text,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const Icon(Icons.lock, size: 18, color: AppConstants.gray),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+
+        // OTP Field
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Verification Code",
+              style: TextStyle(
+                fontSize: 14,
+                color: AppConstants.black50,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _handleOtpVerification(),
+              decoration: InputDecoration(
+                hintText: "Enter 6-digit OTP",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppConstants.white50),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppConstants.purple50,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                counterText: '',
+                suffixIcon: _otpTimeLeft > 0
+                    ? Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            value: _otpTimeLeft / 120,
+                            strokeWidth: 2,
+                            backgroundColor: Colors.grey.shade300,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppConstants.purple50,
                             ),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF5A5FFF), Color(0xFFB833F2)],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Dubai's premier property management platform. Streamline operations, enhance security, and build stronger communities.",
-                        style: Theme.of(context).textTheme.headlineMedium!
-                            .copyWith(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white70,
-                            ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 48),
-                      // Email
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: l10n.email,
-                          prefixIcon: const Icon(Icons.email),
-                          border: const OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null ||
-                              value.isEmpty ||
-                              !value.contains('@')) {
-                            return l10n.invalidEmail;
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // Password
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: l10n.password,
-                          prefixIcon: const Icon(Icons.lock),
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return l10n.invalidPassword;
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      GradientButton(
-                        onPressed: authState.isLoading ? null : _handleLogin,
-                        label: l10n.login,
-                        isLoading: authState.isLoading,
-                      ),
-                    ],
+                      )
+                    : const Icon(Icons.timer_off, color: Colors.red),
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(6),
+              ],
+            ),
+          ],
+        ),
+
+        // Timer display
+        if (_otpTimeLeft > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              'Code expires in ${_otpTimeLeft ~/ 60}:${(_otpTimeLeft % 60).toString().padLeft(2, '0')}',
+              style: TextStyle(
+                color: Colors.orange.shade700,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+
+        // Resend OTP option
+        if (_otpTimeLeft == 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Center(
+              child: TextButton(
+                onPressed: _handleResendOtp,
+                child: const Text(
+                  'Resend OTP',
+                  style: TextStyle(
+                    color: AppConstants.purple50,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
           ),
-        ],
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+    final l10n = AppLocalizations.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Listen to auth state changes
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      // Handle errors
+      if (next.error != null && !next.isLoading) {
+        AppSnackBar.showError(context: context, message: next.error!);
+      }
+
+      // Handle step transitions
+      if (previous?.step != next.step) {
+        switch (next.step) {
+          case AuthStep.otpSent:
+            _startOtpTimer();
+            AppSnackBar.showSuccess(
+              context: context,
+              message: 'OTP sent successfully to ${_emailController.text}',
+            );
+            break;
+          case AuthStep.verified:
+            _stopOtpTimer();
+            AppSnackBar.showSuccess(
+              context: context,
+              message: 'Login successful!',
+            );
+            // Delay the navigation to avoid calling context during build
+            // Future.microtask(() {
+            //   context.replace('/home');
+            // });
+            // Navigation will be handled by router
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    final showOtpForm = authState.needsOtpVerification;
+    final formHeight = showOtpForm ? screenHeight * 0.45 : screenHeight * 0.55;
+
+    return Scaffold(
+      body: Container(
+        height: screenHeight,
+        decoration: const BoxDecoration(
+          gradient: AppConstants.secondartGradient,
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // Top content
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 30,
+                        top: 60,
+                        bottom: 7,
+                        right: 5,
+                      ),
+                      child: Text(
+                        "PropertyManager",
+                        style: GoogleFonts.lato(
+                          textStyle: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30, right: 5),
+                      child: Text(
+                        "Dubai's premier property management platform. Streamline operations, enhance security, and build stronger communities.",
+                        style: GoogleFonts.lato(
+                          textStyle: Theme.of(context).textTheme.headlineMedium!
+                              .copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white70,
+                                letterSpacing: 0.1,
+                                height: 1.1,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Bottom form container
+              Positioned(
+                bottom: 0,
+                left: 13,
+                right: 13,
+                child: Container(
+                  height: formHeight,
+                  decoration: const BoxDecoration(
+                    color: AppConstants.whiteColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 20,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: 16),
+                            Text(
+                              showOtpForm ? 'Verify OTP' : "Welcome Back",
+                              style: GoogleFonts.lato(
+                                textStyle: const TextStyle(
+                                  fontSize: 28,
+                                  letterSpacing: 0.07,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppConstants.black,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              showOtpForm
+                                  ? "Please enter the OTP sent to ${_emailController.text}"
+                                  : "Enter your details below",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: AppConstants.black50,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+
+                            // Dynamic form content
+                            if (showOtpForm)
+                              _buildOtpForm()
+                            else
+                              _buildLoginForm(l10n),
+
+                            const SizedBox(height: 32),
+
+                            // Submit button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: GradientButton(
+                                onPressed: authState.isLoading
+                                    ? null
+                                    : (showOtpForm
+                                          ? _handleOtpVerification
+                                          : _handleLogin),
+                                label: showOtpForm
+                                    ? (authState.step == AuthStep.verifyingOtp
+                                          ? 'Verifying...'
+                                          : 'Verify OTP')
+                                    : (authState.step == AuthStep.authenticating
+                                          ? 'Signing In...'
+                                          : 'Sign In'),
+                                isLoading: authState.isLoading,
+                              ),
+                            ),
+
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

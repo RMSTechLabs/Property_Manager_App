@@ -33,6 +33,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
     super.didChangeDependencies();
     FlutterError.onError = (FlutterErrorDetails details) {
       if (mounted) {
+        if (!mounted) return;//
         setState(() {
           _error = details.exception;
           _stackTrace = details.stack;
