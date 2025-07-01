@@ -9,7 +9,7 @@ import '../../core/errors/exceptions.dart';
 import '../../presentation/providers/dio_provider.dart';
 
 abstract class MasterRemoteDataSource {
-  Future<SocietyStateModel> getCommunityForResident(String email);
+  Future<List<SocietyStateModel>> getCommunityForResident(String email);
 }
 
 class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
@@ -19,17 +19,20 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
   MasterRemoteDataSourceImpl(this.dio);
 
   @override
-  Future<SocietyStateModel> getCommunityForResident(String email) async {
+  Future<List<SocietyStateModel>> getCommunityForResident(String email) async {
     try {
       final response = await dio.get(
         '${ApiConstants.getCommunityForResidentEndpoint}?ownerEmail=$email',
       );
-      print(response.data);
       if (response.statusCode == 200) {
         if (response.data["success"] == false) {
           throw AuthException("Check Your EmailId");
         }
-        return SocietyStateModel.fromJson(response.data);
+
+        final List<dynamic> dataList = response.data["data"];
+        return dataList
+            .map((json) => SocietyStateModel.fromJson(json))
+            .toList();
       } else {
         throw ServerException('Server Error!');
       }
@@ -46,7 +49,7 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
       }
     } catch (e) {
       if (e is NetworkException || e is ServerException) {
-        rethrow; // Re-throw our custom exceptions
+        rethrow;
       }
       throw ServerException('Unexpected error occurred');
     }

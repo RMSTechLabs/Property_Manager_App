@@ -21,7 +21,7 @@ class AuthResponseModel {
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     try {
       final data = json['data'];
-      print('🔍 Mapping AuthResponseModel from: $data');
+     
       return AuthResponseModel(
         accessToken: data['token'] ?? data['access_token'] ?? '',
         refreshToken: data['refreshToken'] ?? data['refresh_token'] ?? '',

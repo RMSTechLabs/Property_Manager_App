@@ -21,7 +21,6 @@ class AuthRepositoryImpl implements AuthRepository {
   ) async {
     try {
       final authResponse = await remoteDataSource.login(email, password);
-      print(authResponse.toJson());
       return Right((
         authResponse.accessToken,
         authResponse.refreshToken,

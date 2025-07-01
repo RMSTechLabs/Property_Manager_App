@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:property_manager_app/src/presentation/screens/help_desk.dart';
 import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/login_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/onboarding_screen.dart';
@@ -76,6 +77,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/login',
         name: 'login',
         builder: (context, _) => const LoginScreen(),
+      ),
+       GoRoute(
+        path: '/help_desk',
+        name: 'help_desk',
+        builder: (context, _) => const HelpDeskScreen(),
       ),
       // GoRoute(
       //   path: '/home',

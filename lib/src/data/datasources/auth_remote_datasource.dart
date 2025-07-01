@@ -147,9 +147,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiConstants.refreshTokenEndpoint,
         data: {'token': refreshToken},
       );
-
       if (response.statusCode == 200) {
-        return response.data['accessToken'];
+        return response.data['data']['token'];
       } else {
         throw AuthException('Token refresh failed');
       }

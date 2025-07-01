@@ -5,7 +5,7 @@ import 'package:property_manager_app/src/data/models/society_state_model.dart';
 import '../../core/errors/failures.dart';
 
 abstract class MasterRepository {
-  Future<Either<Failure, SocietyStateModel>> getCommunityForResident(
+  Future<Either<Failure, List<SocietyStateModel>>> getCommunityForResident(
     String email,
   );
 }

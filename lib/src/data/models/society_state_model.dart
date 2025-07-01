@@ -1,37 +1,41 @@
 class SocietyStateModel {
-  final String societyId;
-  final String apartmentId;
-  final String id;
-  final String block;
-  final String flat;
-  final String society;
-  final String areaId;
-  final String residentType;
+  final String? societyId;
+  final String? apartmentId;
+  final String? id;
+  final String? block;
+  final String? flat;
+  final String? society;
+  final String? areaId;
+  final String? residentType;
+
 
   SocietyStateModel({
-    required this.societyId,
-    required this.apartmentId,
-    required this.id,
-    required this.block,
-    required this.flat,
-    required this.society,
-    required this.areaId,
-    required this.residentType,
+     this.societyId,
+     this.apartmentId,
+     this.id,
+     this.block,
+     this.flat,
+     this.society,
+     this.areaId,
+     this.residentType,
+  
   });
 
   /// Factory constructor to create [SocietyStateModel] from JSON
-  factory SocietyStateModel.fromJson(Map<String, dynamic> json) {
-    return SocietyStateModel(
-      societyId: json['societyId'] ?? '',
-      apartmentId: json['apartmentId'] ?? '',
-      id: json['id'] ?? '',
-      block: json['block'] ?? '',
-      flat: json['flat'] ?? '',
-      society: json['society'] ?? '',
-      areaId: json['areaId'] ?? '',
-      residentType: json['residentType'] ?? '',
-    );
-  }
+ factory SocietyStateModel.fromJson(Map<String, dynamic> json) {
+  return SocietyStateModel(
+    societyId: json['societyId']?.toString(),
+    apartmentId: json['apartmentId']?.toString(),
+    id: json['id']?.toString(),
+    block: json['block'] ?? '',
+    flat: json['flat']?.toString(),
+    society: json['societyName'] ?? '',
+    areaId: json['areaId']?.toString(),
+    residentType: json['residentType'] ?? '',
+
+  );
+}
+
 
   /// Convert [SocietyStateModel] to JSON
   Map<String, dynamic> toJson() {
@@ -56,6 +60,7 @@ class SocietyStateModel {
     String? society,
     String? areaId,
     String? residentType,
+
   }) {
     return SocietyStateModel(
       societyId: societyId ?? this.societyId,
@@ -66,6 +71,7 @@ class SocietyStateModel {
       society: society ?? this.society,
       areaId: areaId ?? this.areaId,
       residentType: residentType ?? this.residentType,
+   
     );
   }
 

@@ -15,7 +15,7 @@ class MasterRepositoryImpl implements MasterRepository {
 
  
   @override
-  Future<Either<Failure, SocietyStateModel>> getCommunityForResident(String email) async {
+  Future<Either<Failure, List<SocietyStateModel>>> getCommunityForResident(String email) async {
     try {
       final communityResponse = await remoteDataSource.getCommunityForResident(email);
       return Right(communityResponse);

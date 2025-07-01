@@ -1,29 +1,29 @@
 // Dashboard Screen (Image 1) - Responsive with TypeAhead and Skeleton Loading
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:redacted/redacted.dart';
+import 'package:logger/logger.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
-import './profile_screen.dart';
+import 'package:property_manager_app/src/data/models/society_state_model.dart';
+import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
+import 'package:redacted/redacted.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _communityController = TextEditingController();
+  Logger logger = Logger(printer: PrettyPrinter());
   bool _isLoading = true;
-
-  static const tabs = ['/home', '/settings', '/profile'];
-  int _locationToTabIndex(String location) {
-    final index = tabs.indexWhere((path) => location.startsWith(path));
-    return index < 0 ? 0 : index;
-  }
-
+  bool _isError = false;
+  String _errorMessage = 'Something went wrong. Please try again later.';
+  late FocusNode _communityFocusNode;
   // Dynamic community data
   List<CommunityItem> communities = [];
   CommunityItem? selectedCommunity;
@@ -31,14 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  void _navigateToProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ProfileScreen()),
-    );
+    // Wait for the first frame to render before unfocusing
+    _communityFocusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   Future<void> _loadData() async {
@@ -46,70 +43,60 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Load data from Riverpod provider
+      await ref.read(societyStateProvider.notifier).initialize();
 
-    setState(() {
-      communities = [
-        CommunityItem(id: "com1", name: "Com-1", description: "Community 1"),
-        CommunityItem(id: "com2", name: "Com-2", description: "Community 2"),
-        CommunityItem(id: "com3", name: "Com-3", description: "Community 3"),
-        CommunityItem(
-          id: "com4",
-          name: "Marina Bay",
-          description: "Marina Bay Community",
-        ),
-        CommunityItem(
-          id: "com5",
-          name: "Palm Jumeirah",
-          description: "Palm Jumeirah Towers",
-        ),
-        CommunityItem(
-          id: "com6",
-          name: "Downtown Dubai",
-          description: "Downtown Complex",
-        ),
-        CommunityItem(id: "com1", name: "Com-1", description: "Community 1"),
-        CommunityItem(id: "com2", name: "Com-2", description: "Community 2"),
-        CommunityItem(id: "com3", name: "Com-3", description: "Community 3"),
-        CommunityItem(
-          id: "com4",
-          name: "Marina Bay",
-          description: "Marina Bay Community",
-        ),
-        CommunityItem(
-          id: "com5",
-          name: "Palm Jumeirah",
-          description: "Palm Jumeirah Towers",
-        ),
-        CommunityItem(
-          id: "com6",
-          name: "Downtown Dubai",
-          description: "Downtown Complex",
-        ),
-        CommunityItem(id: "com1", name: "Com-1", description: "Community 1"),
-        CommunityItem(id: "com2", name: "Com-2", description: "Community 2"),
-        CommunityItem(id: "com3", name: "Com-3", description: "Community 3"),
-        CommunityItem(
-          id: "com4",
-          name: "Marina Bay",
-          description: "Marina Bay Community",
-        ),
-        CommunityItem(
-          id: "com5",
-          name: "Palm Jumeirah",
-          description: "Palm Jumeirah Towers",
-        ),
-        CommunityItem(
-          id: "com6",
-          name: "Downtown Dubai",
-          description: "Downtown Complex",
-        ),
-      ];
-      selectedCommunity = communities.first;
-      _communityController.text = selectedCommunity!.name;
-      _isLoading = false;
-    });
+      final societyListState = ref.read(societyStateProvider);
+
+      if (societyListState.societies.isNotEmpty) {
+        setState(() {
+          communities = _convertSocietiesToCommunityItems(
+            societyListState.societies,
+            societyListState.ownerOrTenantName!,
+          );
+          if (communities.isNotEmpty) {
+            selectedCommunity = communities.first;
+
+            _communityController.text = selectedCommunity!.name.split(',')[0];
+            // 🔥 SET INITIAL SOCIETY ID GLOBALLY
+            ref.read(selectedSocietyIdProvider.notifier).state =
+                selectedCommunity!.id;
+            logger.i('Initial society ID set: ${selectedCommunity!.id}');
+          }
+          _isLoading = false;
+          _isError = false;
+        });
+      } else {
+        setState(() {
+          _isError = true;
+          _isLoading = false;
+          _errorMessage = societyListState.error ?? 'No communities found.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isError = true;
+        _isLoading = false;
+        _errorMessage = 'An error occurred while loading data: $e';
+      });
+    }
+  }
+
+  List<CommunityItem> _convertSocietiesToCommunityItems(
+    List<SocietyStateModel> societies,
+    String ownerOrTenantName,
+  ) {
+    return societies.map((society) {
+      return CommunityItem(
+        id: society.id ?? 'unknown',
+        name:
+            '${society.block ?? ''}-${society.flat ?? ''},${society.block},${society.society}'
+                .trim(),
+        residentType: society.residentType ?? 'Unknown',
+        ownerOrTenantName: ownerOrTenantName,
+      );
+    }).toList();
   }
 
   @override
@@ -117,69 +104,105 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppConstants.secondartGradient,
+    if (_isError) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(screenWidth * 0.05),
+            child: Text(
+              _errorMessage,
+              style: GoogleFonts.lato(fontSize: 16, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header with Community TypeAhead
-              Padding(
-                padding: EdgeInsets.all(screenWidth * 0.05),
-                child: Row(
-                  children: [
-                    SizedBox(width: screenWidth * 0.03),
-                    Expanded(
-                      child: _isLoading
-                          ? _buildSkeletonTypeAhead()
-                          : _buildCommunityTypeAhead(),
-                    ),
-                  ],
-                ),
-              ),
+      );
+    }
 
-              // Main Content Area
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(top: screenHeight * 0.025),
-                  decoration: const BoxDecoration(
-                    color: AppConstants.whiteColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: AppConstants.secondartGradient,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Header with Community TypeAhead
+                Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  child: Row(
                     children: [
-                      // Grid Cards
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(screenWidth * 0.05),
-                          child: _isLoading
-                              ? _buildSkeletonGrid(screenWidth)
-                              : _buildDashboardGrid(screenWidth),
+                      Container(
+                        width: screenWidth * 0.12,
+                        height: screenWidth * 0.12,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(
+                            screenWidth * 0.06,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.home_outlined,
+                          color: Colors.white,
+                          size: screenWidth * 0.06,
                         ),
                       ),
-
-                      // Amenities Section
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          screenWidth * 0.05,
-                          0,
-                          screenWidth * 0.05,
-                          screenWidth * 0.05,
-                        ),
+                      SizedBox(width: screenWidth * 0.03),
+                      Expanded(
                         child: _isLoading
-                            ? _buildSkeletonAmenities(screenWidth)
-                            : _buildAmenitiesCard(screenWidth),
+                            ? _buildSkeletonTypeAhead()
+                            : _buildCommunityTypeAhead(),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+
+                // Main Content Area
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(top: screenHeight * 0.025),
+                    decoration: const BoxDecoration(
+                      color: AppConstants.whiteColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        // Grid Cards
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(screenWidth * 0.05),
+                            child: _isLoading
+                                ? _buildSkeletonGrid(screenWidth)
+                                : _buildDashboardGrid(screenWidth),
+                          ),
+                        ),
+
+                        // Amenities Section
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            screenWidth * 0.05,
+                            0,
+                            screenWidth * 0.05,
+                            screenWidth * 0.05,
+                          ),
+                          child: _isLoading
+                              ? _buildSkeletonAmenities(screenWidth)
+                              : _buildAmenitiesCard(screenWidth),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -187,114 +210,160 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCommunityTypeAhead() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Community",
-          style: GoogleFonts.lato(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppConstants.black,
-          ),
-        ),
-        const SizedBox(height: 4), // Space between title and input
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.52),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.52)),
-          ),
-          child: TypeAheadField<CommunityItem>(
-            controller: _communityController,
-            builder: (context, controller, focusNode) {
-              return TextField(
-                controller: controller,
-                focusNode: focusNode,
+    return Container(
+      // constraints: const BoxConstraints(minHeight:10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.52),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.52)),
+      ),
+      child: TypeAheadField<CommunityItem>(
+        controller: _communityController,
+        debounceDuration: const Duration(milliseconds: 300), //
+
+        builder: (context, controller, focusNode) {
+          return TextField(
+            controller: controller,
+            focusNode: focusNode,
+            style: GoogleFonts.lato(
+              color: Colors.black,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: InputDecoration(
+              // border: InputBorder.none,
+              fillColor: Colors.transparent,
+              hint: Text(
+                "Select Community",
                 style: GoogleFonts.lato(
+                  color: AppConstants.black50,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              suffixIcon: GestureDetector(
+                // onTap: () {
+                //   if (_communityFocusNode.hasFocus) {
+                //     _communityFocusNode.unfocus(); // Hide dropdown
+                //   } else {
+                //     _communityFocusNode.requestFocus(); // Show dropdown
+                //   }
+                // },
+                child: const Icon(
+                  Icons.keyboard_arrow_down,
                   color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
                 ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Colors.transparent,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+              ),
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.white),
+              ),
+            ),
+          );
+        },
+        suggestionsCallback: (pattern) {
+          return communities
+              .where(
+                (community) => community.name.toLowerCase().contains(
+                  pattern.toLowerCase(),
+                ),
+              )
+              .toList();
+        },
+        itemBuilder: (context, community) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F4F5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  community.name,
+                  style: GoogleFonts.lato(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppConstants.black,
                   ),
-                  suffixIcon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.black,
-                  ),
                 ),
-              );
-            },
-            suggestionsCallback: (pattern) {
-              return communities
-                  .where(
-                    (community) => community.name.toLowerCase().contains(
-                      pattern.toLowerCase(),
-                    ),
-                  )
-                  .toList();
-            },
-            itemBuilder: (context, community) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF2F4F5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      community.name,
-                      style: GoogleFonts.lato(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppConstants.black,
-                      ),
-                    ),
-                    if (community.description.isNotEmpty)
+                if (community.residentType.isNotEmpty)
+                  Row(
+                    children: [
                       Text(
-                        community.description,
+                        community.ownerOrTenantName,
                         style: GoogleFonts.lato(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: AppConstants.black50,
                         ),
                       ),
-                  ],
-                ),
-              );
-            },
-            onSelected: (community) {
-              setState(() {
-                selectedCommunity = community;
-                _communityController.text = community.name;
-              });
-            },
-            decorationBuilder: (context, child) {
-              return Material(
-                type: MaterialType.card,
-                elevation: 4,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF2F4F5),
-                    borderRadius: BorderRadius.circular(8),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: community.residentType == 'owner'
+                              ? Colors.green.shade100
+                              : Colors
+                                    .orange
+                                    .shade100, // or any color you prefer
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          community.residentType,
+                          style: GoogleFonts.lato(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade800,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: child,
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+              ],
+            ),
+          );
+        },
+        onSelected: (community) {
+          ref.read(selectedSocietyIdProvider.notifier).state = community.id;
+          logger.i('Society ID changed to: ${community.id}');
+          setState(() {
+            selectedCommunity = community;
+            _communityController.text = community.name.split(',')[0];
+          });
+        },
+        decorationBuilder: (context, child) {
+          return Material(
+            type: MaterialType.card,
+            elevation: 4,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F4F5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: child,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -653,10 +722,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Navigation methods
   void _navigateToVisitors() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PropertySelectionScreen()),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => const PropertySelectionScreen()),
+    // );
+    print('Navigate to Notify Gate');
   }
 
   void _navigateToNotifyGate() {
@@ -664,7 +734,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToHelpDesk() {
-    print('Navigate to Help Desk');
+    context.push('/help_desk');
   }
 
   void _navigateToNoticeBoard() {
@@ -678,566 +748,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _communityController.dispose();
-    super.dispose();
-  }
-}
-
-// Property Selection Screen (Image 2) - Responsive with TypeAhead and Skeleton Loading
-class PropertySelectionScreen extends StatefulWidget {
-  const PropertySelectionScreen({super.key});
-
-  @override
-  State<PropertySelectionScreen> createState() =>
-      _PropertySelectionScreenState();
-}
-
-class _PropertySelectionScreenState extends State<PropertySelectionScreen> {
-  final TextEditingController _communityController = TextEditingController();
-  bool _isLoading = true;
-
-  List<CommunityItem> communities = [];
-  List<PropertyItem> properties = [];
-  CommunityItem? selectedCommunity;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      communities = [
-        CommunityItem(id: "com1", name: "Com-1", description: "Community 1"),
-        CommunityItem(id: "com2", name: "Com-2", description: "Community 2"),
-        CommunityItem(id: "com3", name: "Com-3", description: "Community 3"),
-        CommunityItem(
-          id: "com4",
-          name: "Marina Bay",
-          description: "Marina Bay Community",
-        ),
-        CommunityItem(
-          id: "com5",
-          name: "Palm Jumeirah",
-          description: "Palm Jumeirah Towers",
-        ),
-      ];
-
-      properties = [
-        PropertyItem(
-          id: "SO4-SO4-Office",
-          name: "SO4, Afnan Building",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Community-CO1",
-          name: "Community Offices, BNH Tower",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Unit-Admin Office 3",
-          name: "Unit, Blue Wave Tower",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Community-CO1",
-          name: "Community Offices, EQUITY",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Unit-SO-1",
-          name: "Unit, Joya Blanca Residence",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "A-101, A Block",
-          name: "Maple Wood Residency",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Ops-2001, Ops",
-          name: "Maple Wood Residency",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "Unit-Admin Office 2",
-          name: "Unit, Marina Pinnacle",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-        PropertyItem(
-          id: "i-Oakley Square_FM, i",
-          name: "Oakley Square JVC - Block A",
-          tenant: "Gopal prasad",
-          type: "Tenant",
-        ),
-      ];
-
-      selectedCommunity = communities.first;
-      _communityController.text = selectedCommunity!.name;
-      _isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppConstants.secondartGradient,
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header with Community TypeAhead
-              Padding(
-                padding: EdgeInsets.all(screenWidth * 0.05),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: screenWidth * 0.12,
-                        height: screenWidth * 0.12,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(
-                            screenWidth * 0.06,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Colors.white,
-                          size: screenWidth * 0.05,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.03),
-                    Expanded(
-                      child: _isLoading
-                          ? _buildSkeletonTypeAhead(screenWidth)
-                          : _buildCommunityTypeAhead(),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Properties List
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(top: screenHeight * 0.025),
-                  decoration: const BoxDecoration(
-                    color: AppConstants.whiteColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? _buildSkeletonList(screenWidth)
-                      : _buildPropertiesList(screenWidth),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavigation(),
-    );
-  }
-
-  Widget _buildCommunityTypeAhead() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
-      child: TypeAheadField<CommunityItem>(
-        controller: _communityController,
-        builder: (context, controller, focusNode) {
-          return TextField(
-            controller: controller,
-            focusNode: focusNode,
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              suffixIcon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
-            ),
-          );
-        },
-        suggestionsCallback: (pattern) {
-          return communities
-              .where(
-                (community) => community.name.toLowerCase().contains(
-                  pattern.toLowerCase(),
-                ),
-              )
-              .toList();
-        },
-        itemBuilder: (context, community) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(color: Color(0xFFF2F4F5)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  community.name,
-                  style: GoogleFonts.lato(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppConstants.black,
-                  ),
-                ),
-                if (community.description.isNotEmpty)
-                  Text(
-                    community.description,
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      color: AppConstants.black50,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-        onSelected: (community) {
-          setState(() {
-            selectedCommunity = community;
-            _communityController.text = community.name;
-            // Reload properties for selected community
-            _loadPropertiesForCommunity(community.id);
-          });
-        },
-        decorationBuilder: (context, child) {
-          return Material(
-            type: MaterialType.card,
-            elevation: 4,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: child,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSkeletonTypeAhead(double screenWidth) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 20,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ).redacted(context: context, redact: true),
-          ),
-          const SizedBox(width: 8),
-          Icon(Icons.keyboard_arrow_down, color: Colors.white.withOpacity(0.5)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPropertiesList(double screenWidth) {
-    return ListView.builder(
-      padding: EdgeInsets.all(screenWidth * 0.05),
-      itemCount: properties.length,
-      itemBuilder: (context, index) {
-        return _buildPropertyCard(properties[index], screenWidth);
-      },
-    );
-  }
-
-  Widget _buildSkeletonList(double screenWidth) {
-    return ListView.builder(
-      padding: EdgeInsets.all(screenWidth * 0.05),
-      itemCount: 8,
-      itemBuilder: (context, index) {
-        return _buildSkeletonPropertyCard(screenWidth);
-      },
-    );
-  }
-
-  Widget _buildPropertyCard(PropertyItem property, double screenWidth) {
-    return Container(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(screenWidth * 0.04),
-        leading: Container(
-          width: screenWidth * 0.12,
-          height: screenWidth * 0.12,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF10B981), Color(0xFF059669)],
-            ),
-            borderRadius: BorderRadius.circular(screenWidth * 0.06),
-          ),
-          child: Icon(
-            Icons.apartment,
-            color: Colors.white,
-            size: screenWidth * 0.06,
-          ),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              property.id,
-              style: GoogleFonts.lato(
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.bold,
-                color: AppConstants.black,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              property.name,
-              style: GoogleFonts.lato(
-                fontSize: screenWidth * 0.035,
-                color: AppConstants.black,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-        subtitle: Padding(
-          padding: EdgeInsets.only(top: screenWidth * 0.02),
-          child: Row(
-            children: [
-              Flexible(
-                child: Text(
-                  property.tenant,
-                  style: GoogleFonts.lato(
-                    fontSize: screenWidth * 0.032,
-                    color: AppConstants.black50,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(width: screenWidth * 0.02),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.02,
-                  vertical: screenWidth * 0.005,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  property.type,
-                  style: GoogleFonts.lato(
-                    fontSize: screenWidth * 0.028,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF6366F1),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        onTap: () => _selectProperty(property),
-      ),
-    );
-  }
-
-  Widget _buildSkeletonPropertyCard(double screenWidth) {
-    return Container(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.03),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(screenWidth * 0.04),
-        leading: Container(
-          width: screenWidth * 0.12,
-          height: screenWidth * 0.12,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(screenWidth * 0.06),
-          ),
-        ).redacted(context: context, redact: true),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 16,
-              width: screenWidth * 0.4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ).redacted(context: context, redact: true),
-            SizedBox(height: screenWidth * 0.01),
-            Container(
-              height: 14,
-              width: screenWidth * 0.5,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ).redacted(context: context, redact: true),
-          ],
-        ),
-        subtitle: Padding(
-          padding: EdgeInsets.only(top: screenWidth * 0.02),
-          child: Row(
-            children: [
-              Container(
-                height: 12,
-                width: screenWidth * 0.25,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ).redacted(context: context, redact: true),
-              SizedBox(width: screenWidth * 0.02),
-              Container(
-                height: 20,
-                width: screenWidth * 0.15,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ).redacted(context: context, redact: true),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigation() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF6366F1),
-        unselectedItemColor: AppConstants.black50,
-        selectedLabelStyle: GoogleFonts.lato(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: GoogleFonts.lato(fontSize: 12),
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _selectProperty(PropertyItem property) {
-    print('Selected property: ${property.id}');
-    // Handle property selection
-  }
-
-  void _loadPropertiesForCommunity(String communityId) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate API call for community-specific properties
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        _isLoading = false;
-        // You can filter properties based on community here
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _communityController.dispose();
+    _communityFocusNode.dispose();
     super.dispose();
   }
 }
@@ -1246,25 +757,13 @@ class _PropertySelectionScreenState extends State<PropertySelectionScreen> {
 class CommunityItem {
   final String id;
   final String name;
-  final String description;
+  final String residentType;
+  final String ownerOrTenantName;
 
   CommunityItem({
     required this.id,
     required this.name,
-    required this.description,
-  });
-}
-
-class PropertyItem {
-  final String id;
-  final String name;
-  final String tenant;
-  final String type;
-
-  PropertyItem({
-    required this.id,
-    required this.name,
-    required this.tenant,
-    required this.type,
+    required this.residentType,
+    required this.ownerOrTenantName,
   });
 }
