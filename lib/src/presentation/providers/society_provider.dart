@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:property_manager_app/src/data/models/community_item_model.dart';
 import 'package:property_manager_app/src/data/models/society_state_model.dart';
 import 'package:property_manager_app/src/domain/usecases/master/get_community_for_resident_usecase.dart';
 import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
+import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 
 // class SocietyStateNotifier extends StateNotifier<SocietyStateModel> {
 //   final Ref _ref;
@@ -156,3 +158,4 @@ final societyStateProvider =
     });
 
 final selectedSocietyIdProvider = StateProvider<String?>((ref) => null);
+final selectedCommunityProvider = StateProvider<CommunityItem?>((ref) => null);

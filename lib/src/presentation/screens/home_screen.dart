@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
+import 'package:property_manager_app/src/data/models/community_item_model.dart';
 import 'package:property_manager_app/src/data/models/society_state_model.dart';
 import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
 import 'package:redacted/redacted.dart';
+import 'package:property_manager_app/src/core/utils/app_helper.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -59,10 +61,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             selectedCommunity = communities.first;
 
             _communityController.text = selectedCommunity!.name.split(',')[0];
-            // 🔥 SET INITIAL SOCIETY ID GLOBALLY
-            ref.read(selectedSocietyIdProvider.notifier).state =
-                selectedCommunity!.id;
-            logger.i('Initial society ID set: ${selectedCommunity!.id}');
+            // 🔥 SET INITIAL COMMUNITY GLOBALLY
+            ref.read(selectedCommunityProvider.notifier).state =
+                selectedCommunity;
+            logger.i('Initial community set: ${selectedCommunity!.id}');
           }
           _isLoading = false;
           _isError = false;
@@ -91,10 +93,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return CommunityItem(
         id: society.id ?? 'unknown',
         name:
-            '${society.block ?? ''}-${society.flat ?? ''},${society.block},${society.society}'
+            '${society.block ?? ''}-${society.flat ?? ''}-${society.societyId ?? ''}-${society.apartmentId ?? ''},${society.block},${society.society}'
                 .trim(),
         residentType: society.residentType ?? 'Unknown',
         ownerOrTenantName: ownerOrTenantName,
+        societyId: society.societyId?.toString() ?? '',
+        apartmentId: society.apartmentId?.toString() ?? '',
       );
     }).toList();
   }
@@ -321,15 +325,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         decoration: BoxDecoration(
                           color: community.residentType == 'owner'
                               ? Colors.green.shade100
-                              : Colors
-                                    .orange
-                                    .shade100, // or any color you prefer
+                              : Colors.blue.shade100, // or any color you prefer
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          community.residentType,
+                          AppHelper.toSentenceCase(community.residentType),
                           style: GoogleFonts.lato(
-                            fontSize: 11,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade800,
                           ),
@@ -342,8 +344,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
         onSelected: (community) {
-          ref.read(selectedSocietyIdProvider.notifier).state = community.id;
-          logger.i('Society ID changed to: ${community.id}');
+          ref.read(selectedCommunityProvider.notifier).state = community;
+          logger.i('Community changed to: ${community.id}');
           setState(() {
             selectedCommunity = community;
             _communityController.text = community.name.split(',')[0];
@@ -753,17 +755,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// Data models
-class CommunityItem {
-  final String id;
-  final String name;
-  final String residentType;
-  final String ownerOrTenantName;
-
-  CommunityItem({
-    required this.id,
-    required this.name,
-    required this.residentType,
-    required this.ownerOrTenantName,
-  });
-}

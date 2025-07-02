@@ -13,8 +13,9 @@ class ApiConstants {
   static const String userProfileEndpoint = '/auth/me';
   static const String sendOtpEndpoint = "/auth/send-otp";
   static const String validateOtpEndpoint = "/auth/validate-otp";
-    static const String getCommunityForResidentEndpoint =
+  static const String getCommunityForResidentEndpoint =
       '/master/resident-society-details';
+  static const String getComplaintsEndpoint = '/complaints/all-complaint';
 
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));

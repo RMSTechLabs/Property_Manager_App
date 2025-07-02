@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/data/models/onboarding_model.dart';
 import 'package:property_manager_app/src/presentation/providers/onboarding_provider.dart';
-import 'package:go_router/go_router.dart'; 
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -512,6 +512,62 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
             ),
           ),
+          // GestureDetector(
+          //   onTap: _nextPage,
+          //   child: AnimatedContainer(
+          //     duration: const Duration(milliseconds: 200),
+          //     // width: _getButtonSize(size, isTablet, isSmallScreen),
+          //     width: _currentPage == _totalPages - 1
+          //         ? _getButtonSize(size, isTablet, isSmallScreen) * 2
+          //         : _getButtonSize(size, isTablet, isSmallScreen),
+
+          //     height: _getButtonSize(size, isTablet, isSmallScreen),
+          //     decoration: BoxDecoration(
+          //       color: const Color(0xFFFFD700),
+          //       // shape: BoxShape.circle,
+          //       shape: _currentPage == _totalPages - 1
+          //           ? BoxShape.rectangle
+          //           : BoxShape.circle,
+          //       borderRadius: _currentPage == _totalPages - 1
+          //           ? BorderRadius.circular(30)
+          //           : null,//
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: const Color(0xFFFFD700).withOpacity(0.3),
+          //           blurRadius: isSmallScreen ? 25 : 35,
+          //           offset: const Offset(0, 12),
+          //         ),
+          //         BoxShadow(
+          //           color: Colors.black.withOpacity(0.1),
+          //           blurRadius: 15,
+          //           offset: const Offset(0, 5),
+          //         ),
+          //       ],
+          //     ),
+          //     child: Center(
+          //       child: _currentPage == _totalPages - 1
+          //           ? Text(
+          //               "Get Started",
+          //               style: TextStyle(
+          //                 color: const Color(0xFF1a1a1a),
+          //                 fontWeight: FontWeight.bold,
+          //                 fontSize:
+          //                     _getButtonIconSize(
+          //                       size,
+          //                       isTablet,
+          //                       isSmallScreen,
+          //                     ) *
+          //                     0.6,
+          //               ),
+          //             )
+          //           : Icon(
+          //               Icons.arrow_forward_ios,
+          //               color: const Color(0xFF1a1a1a),
+          //               size: _getButtonIconSize(size, isTablet, isSmallScreen),
+          //             ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

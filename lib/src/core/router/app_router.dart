@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:property_manager_app/src/presentation/screens/create_complaint_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/help_desk.dart';
 import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/login_screen.dart';
@@ -9,7 +10,7 @@ import 'package:property_manager_app/src/presentation/screens/profile_screen.dar
 import 'package:property_manager_app/src/presentation/screens/setting_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/splash_screen.dart';
 import 'package:property_manager_app/src/presentation/widgets/buttom_tab.dart';
-
+import 'package:property_manager_app/src/presentation/screens/ticket_detail_screen.dart';
 import '../../presentation/providers/auth_state_provider.dart';
 import '../../presentation/providers/onboarding_provider.dart';
 
@@ -32,30 +33,62 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   // });
   final authNotifier = AuthRefreshNotifier(ref); // 👈 Updated
   return GoRouter(
-    initialLocation: '/onboarding',
+    // initialLocation: '/onboarding',
+    initialLocation: '/splash',
+
     refreshListenable: authNotifier,
     debugLogDiagnostics: kDebugMode,
+    // redirect: (context, state) {
+    //   final authState = ref.read(authStateProvider);
+    //   final onboardingComplete = ref.read(onboardingProvider);
+    //   final onboardingReady = ref.read(onboardingReadyProvider);
+
+    //   final location = state.matchedLocation;
+    //   print(location);
+    //   print(authState.isOtpVerified);
+    //   // Wait for both onboarding and auth to load
+    //   // ⏳ Wait until both onboarding and auth are ready
+    //   if (!authState.isInitialized || !onboardingReady) return null;
+
+    //   if (!onboardingComplete) {
+    //     return location == '/onboarding' ? null : '/onboarding';
+    //   }
+
+    //   if (!authState.isOtpVerified) {
+    //     return location == '/login' ? null : '/login';
+    //   }
+
+    //   if (location == '/login' || location == '/onboarding') {
+    //     return '/home';
+    //   }
+
+    //   return null;
+    // },
     redirect: (context, state) {
       final authState = ref.read(authStateProvider);
       final onboardingComplete = ref.read(onboardingProvider);
       final onboardingReady = ref.read(onboardingReadyProvider);
-
       final location = state.matchedLocation;
-      print(location);
-      print(authState.isOtpVerified);
-      // Wait for both onboarding and auth to load
-      // ⏳ Wait until both onboarding and auth are ready
-      if (!authState.isInitialized || !onboardingReady) return null;
 
+      // ⏳ While waiting for state to be ready, stay on splash
+      if (!authState.isInitialized || !onboardingReady) {
+        return location == '/splash' ? null : '/splash';
+      }
+
+      // ✅ Onboarding flow
       if (!onboardingComplete) {
         return location == '/onboarding' ? null : '/onboarding';
       }
 
+      // ✅ Auth flow
       if (!authState.isOtpVerified) {
         return location == '/login' ? null : '/login';
       }
 
-      if (location == '/login' || location == '/onboarding') {
+      // ✅ Already onboarded and authenticated
+      if (location == '/login' ||
+          location == '/onboarding' ||
+          location == '/splash') {
         return '/home';
       }
 
@@ -78,10 +111,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'login',
         builder: (context, _) => const LoginScreen(),
       ),
-       GoRoute(
+      GoRoute(
         path: '/help_desk',
         name: 'help_desk',
         builder: (context, _) => const HelpDeskScreen(),
+      ),
+      GoRoute(
+        path: '/ticket/:id',
+        name: 'ticketDetail',
+        builder: (context, state) {
+          final ticketId = state.pathParameters['id']!;
+          return TicketDetailScreen(ticketId: ticketId);
+        },
+      ),
+       GoRoute(
+        path: '/createComplaint',
+        name: 'createComplaint',
+        builder: (context, _) => const CreateComplaintScreen(),
       ),
       // GoRoute(
       //   path: '/home',
