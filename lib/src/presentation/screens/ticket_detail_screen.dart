@@ -1,22 +1,24 @@
 // Ticket Detail Screen - Responsive with Comments and Reply
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:property_manager_app/src/presentation/providers/ticket_detail_provider.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/data/models/ticket_detail_model.dart';
 
-class TicketDetailScreen extends StatefulWidget {
+class TicketDetailScreen extends ConsumerStatefulWidget {
   final String ticketId;
-
   const TicketDetailScreen({super.key, required this.ticketId});
 
   @override
-  State<TicketDetailScreen> createState() => _TicketDetailScreenState();
+  ConsumerState<TicketDetailScreen> createState() => _TicketDetailScreenState();
 }
 
-class _TicketDetailScreenState extends State<TicketDetailScreen> {
+class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  String get ticketId => widget.ticketId;
   bool _isLoading = true;
   TicketDetailModel? _ticketDetail;
   String _selectedVisibility = "Personal ( Only Me )";
@@ -55,7 +57,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         responseCount: 1,
         createdBy: "Gopal prasad",
         community: "Community-C01",
-        imageUrl: "assets/images/electrical_issue.jpg", // Sample image
+        imageUrls: ["assets/images/electrical_issue.jpg"], // Sample image
         comments: [
           CommentModel(
             id: "1",
@@ -76,6 +78,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final ticketDetail = ref.watch(ticketDetailProvider(ticketId));
+    final notifier = ref.read(ticketDetailProvider(ticketId).notifier);
 
     return Scaffold(
       body: Container(
@@ -99,18 +104,33 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      // Ticket Details
-                      Expanded(
-                        child: _isLoading
-                            ? _buildSkeletonLoader(screenWidth)
-                            : _buildTicketContent(screenWidth),
+                  child: ticketDetail.when(
+                    loading: () => _buildSkeletonLoader(screenWidth),
+                    error: (error, _) => Center(
+                      child: Text(
+                        "Failed to load ticket: $error",
+                        style: TextStyle(color: Colors.red),
                       ),
+                    ),
+                    data: (ticket) => Column(
+                      children: [
+                        // Ticket Details
+                        Expanded(
+                          // child: _isLoading
+                          //     ? _buildSkeletonLoader(screenWidth)
+                          //     : _buildTicketContent(screenWidth),
+                          child: _buildTicketContent(screenWidth, ticket),
+                        ),
 
-                      // Reply Input
-                      _buildReplyInput(screenWidth),
-                    ],
+                        // Reply Input
+                        _buildReplyInput(
+                          screenWidth,
+                          onSend: (text) {
+                            notifier.sendComment(text, _selectedVisibility);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -158,7 +178,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     );
   }
 
-  Widget _buildTicketContent(double screenWidth) {
+  Widget _buildTicketContent(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
     return SingleChildScrollView(
       controller: _scrollController,
       padding: EdgeInsets.all(screenWidth * 0.05),
@@ -166,39 +189,44 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Ticket Header
-          _buildTicketHeader(screenWidth),
+          _buildTicketHeader(screenWidth, ticketDetail),
 
           SizedBox(height: screenWidth * 0.04),
 
           // Ticket Body
-          _buildTicketBody(screenWidth),
+          _buildTicketBody(screenWidth, ticketDetail),
 
           SizedBox(height: screenWidth * 0.04),
 
           // Image Attachment (if exists)
-          if (_ticketDetail!.imageUrl.isNotEmpty)
-            _buildImageAttachment(screenWidth),
+          // if (_ticketDetail!.imageUrl.isNotEmpty)
+          //   _buildImageAttachment(screenWidth),
+          if ((ticketDetail?.imageUrls ?? []).isNotEmpty)
+            _buildImageAttachments(screenWidth, ticketDetail),
 
           SizedBox(height: screenWidth * 0.04),
 
           // Location and Visibility
-          _buildLocationAndVisibility(screenWidth),
+          _buildLocationAndVisibility(screenWidth, ticketDetail),
 
           SizedBox(height: screenWidth * 0.04),
 
           // Response Info
-          _buildResponseInfo(screenWidth),
+          _buildResponseInfo(screenWidth, ticketDetail),
 
           SizedBox(height: screenWidth * 0.04),
 
           // Comments Section
-          _buildCommentsSection(screenWidth),
+          _buildCommentsSection(screenWidth, ticketDetail),
         ],
       ),
     );
   }
 
-  Widget _buildTicketHeader(double screenWidth) {
+  Widget _buildTicketHeader(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -212,7 +240,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
               ),
             ),
             Text(
-              _ticketDetail!.id,
+              ticketDetail!.id,
               style: GoogleFonts.lato(
                 fontSize: screenWidth * 0.035,
                 fontWeight: FontWeight.w600,
@@ -221,12 +249,12 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             ),
           ],
         ),
-        _buildStatusBadge(_ticketDetail!.status, screenWidth),
+        _buildStatusBadge(ticketDetail.status, screenWidth),
       ],
     );
   }
 
-  Widget _buildTicketBody(double screenWidth) {
+  Widget _buildTicketBody(double screenWidth, TicketDetailModel? ticketDetail) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -235,7 +263,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           children: [
             Expanded(
               child: Text(
-                _ticketDetail!.title,
+                ticketDetail!.title,
                 style: GoogleFonts.lato(
                   fontSize: screenWidth * 0.05,
                   fontWeight: FontWeight.bold,
@@ -252,7 +280,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             ),
             SizedBox(width: screenWidth * 0.02),
             Text(
-              _ticketDetail!.category,
+              ticketDetail.category,
               style: GoogleFonts.lato(
                 fontSize: screenWidth * 0.04,
                 color: AppConstants.black50,
@@ -266,7 +294,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
         // Timestamp
         Text(
-          _ticketDetail!.timestamp,
+          ticketDetail.timestamp,
           style: GoogleFonts.lato(
             fontSize: screenWidth * 0.032,
             color: AppConstants.black50,
@@ -276,9 +304,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         SizedBox(height: screenWidth * 0.03),
 
         // Description
-        if (_ticketDetail!.description.isNotEmpty)
+        if (ticketDetail.description.isNotEmpty)
           Text(
-            _ticketDetail!.description,
+            ticketDetail.description,
             style: GoogleFonts.lato(
               fontSize: screenWidth * 0.035,
               color: AppConstants.black,
@@ -288,49 +316,116 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     );
   }
 
-  Widget _buildImageAttachment(double screenWidth) {
-    return Container(
-      width: screenWidth * 0.3,
-      height: screenWidth * 0.25,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.asset(
-          _ticketDetail!.imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey.shade100,
-              child: Icon(
-                Icons.image_outlined,
-                size: screenWidth * 0.08,
-                color: Colors.grey.shade400,
+  // Widget _buildImageAttachment(double screenWidth) {
+  //   return Container(
+  //     width: screenWidth * 0.3,
+  //     height: screenWidth * 0.25,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(8),
+  //       border: Border.all(color: Colors.grey.shade300),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.1),
+  //           blurRadius: 4,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(8),
+  //       child: Image.asset(
+  //         _ticketDetail!.imageUrl,
+  //         fit: BoxFit.cover,
+  //         errorBuilder: (context, error, stackTrace) {
+  //           return Container(
+  //             color: Colors.grey.shade100,
+  //             child: Icon(
+  //               Icons.image_outlined,
+  //               size: screenWidth * 0.08,
+  //               color: Colors.grey.shade400,
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildImageAttachments(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
+    final images = ticketDetail?.imageUrls ?? [];
+    if (images.isEmpty) return SizedBox.shrink();
+
+    return SizedBox(
+      height: screenWidth * 0.20,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+        itemCount: images.length,
+        separatorBuilder: (_, __) => SizedBox(width: screenWidth * 0.03),
+        itemBuilder: (context, index) {
+          return Container(
+            width: screenWidth * 0.20,
+            height: screenWidth * 0.20,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                images[index],
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey.shade100,
+                    child: Icon(
+                      Icons.image_outlined,
+                      size: screenWidth * 0.08,
+                      color: Colors.grey.shade400,
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildLocationAndVisibility(double screenWidth) {
+  Widget _buildLocationAndVisibility(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Location
         Text(
-          "Location : ${_ticketDetail!.location}",
+          "Location : ${ticketDetail!.location}",
+          style: GoogleFonts.lato(
+            fontSize: screenWidth * 0.035,
+            color: AppConstants.black50,
+          ),
+        ),
+
+        SizedBox(height: screenWidth * 0.03),
+
+        //added
+        Text(
+          "Community : ${ticketDetail.community}",
           style: GoogleFonts.lato(
             fontSize: screenWidth * 0.035,
             color: AppConstants.black50,
@@ -347,7 +442,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.03,
-                vertical: screenWidth * 0.02,
+                vertical: screenWidth * 0.01,
               ),
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
@@ -405,7 +500,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                   ),
                 ),
                 Text(
-                  _ticketDetail!.assignee,
+                  ticketDetail.assignee,
                   style: GoogleFonts.lato(
                     fontSize: screenWidth * 0.035,
                     fontWeight: FontWeight.w500,
@@ -420,7 +515,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     );
   }
 
-  Widget _buildResponseInfo(double screenWidth) {
+  Widget _buildResponseInfo(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
       decoration: BoxDecoration(
@@ -441,7 +539,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
               ),
               SizedBox(width: screenWidth * 0.02),
               Text(
-                "${_ticketDetail!.responseCount} Responses",
+                "${ticketDetail!.responseCount} Responses",
                 style: GoogleFonts.lato(
                   fontSize: screenWidth * 0.035,
                   color: AppConstants.black50,
@@ -450,7 +548,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             ],
           ),
           Text(
-            "Created By : ${_ticketDetail!.createdBy} , ${_ticketDetail!.community}",
+            "Created By : ${ticketDetail.createdBy}",
             style: GoogleFonts.lato(
               fontSize: screenWidth * 0.03,
               color: AppConstants.black50,
@@ -461,7 +559,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     );
   }
 
-  Widget _buildCommentsSection(double screenWidth) {
+  Widget _buildCommentsSection(
+    double screenWidth,
+    TicketDetailModel? ticketDetail,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -489,7 +590,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         SizedBox(height: screenWidth * 0.04),
 
         // Comments List
-        ..._ticketDetail!.comments.map(
+        ...ticketDetail!.comments.map(
           (comment) => _buildCommentItem(comment, screenWidth),
         ),
 
@@ -580,7 +681,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     );
   }
 
-  Widget _buildReplyInput(double screenWidth) {
+  Widget _buildReplyInput(
+    double screenWidth, {
+    required void Function(String) onSend,
+  }) {
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -670,7 +774,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
           // Send button
           GestureDetector(
-            onTap: () => _sendReply(),
+            onTap: () => _sendReply(onSend),
             child: Container(
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
@@ -1066,10 +1170,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     // TODO: Implement voice recording
   }
 
-  void _sendReply() {
-    if (_replyController.text.trim().isNotEmpty) {
-      print('Sending reply: ${_replyController.text}');
-      // TODO: Send reply to API
+  void _sendReply(onSend) {
+    final text = _replyController.text.trim();
+    if (text.isNotEmpty) {
+      onSend(text);
       _replyController.clear();
     }
   }

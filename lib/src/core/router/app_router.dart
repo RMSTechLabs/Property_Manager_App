@@ -124,7 +124,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return TicketDetailScreen(ticketId: ticketId);
         },
       ),
-       GoRoute(
+      // GoRoute(
+      //   path: 'ticket/:id',
+      //   name: 'ticketDetail',
+      //   pageBuilder: (context, state) {
+      //     final ticketId = state.pathParameters['id']!;
+      //     return NoTransitionPage(
+      //       child: ProviderScope(
+      //         overrides: [ticketIdProvider.overrideWithValue(ticketId)],
+      //         child: const TicketDetailScreen(),
+      //       ),
+      //     );
+      //   },
+      // ),
+      GoRoute(
         path: '/createComplaint',
         name: 'createComplaint',
         builder: (context, _) => const CreateComplaintScreen(),

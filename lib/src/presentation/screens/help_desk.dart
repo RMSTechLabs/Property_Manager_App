@@ -117,6 +117,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
   }
 
   void _onTicketTap(String ticketId) {
+    ticketId = ticketId.split('-')[1]; // Extract ID from "BT-2" format
     context.pushNamed('ticketDetail', pathParameters: {'id': ticketId});
   }
 

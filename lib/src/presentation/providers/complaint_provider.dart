@@ -7,6 +7,23 @@ import 'package:property_manager_app/src/presentation/providers/dio_provider.dar
 import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
 
 
+// Future<http.StreamedResponse> addComplaints(
+//       Map<String, dynamic> body, List<String> filePaths, WidgetRef ref) async {
+//     try {
+//       final response = await ApiConfig.postMultipartRequest(
+//         'complaint',
+//         'files',
+//         ApiConfig.addComplaintApi,
+//         body,
+//         filePaths,
+//         ref,
+//         isPrivate: true,
+//       );
+//       return response;
+//     } catch (error) {
+//       throw Exception(error);
+//     }
+//   }
 final complaintProvider = FutureProvider.autoDispose<List<TicketModel>>((ref) async {
   final dio = ref.read(dioProvider);
   final selectedCommunity = ref.watch(selectedCommunityProvider);
