@@ -24,37 +24,34 @@ import 'package:property_manager_app/src/presentation/providers/society_provider
 //       throw Exception(error);
 //     }
 //   }
-final complaintProvider = FutureProvider.autoDispose<List<TicketModel>>((ref) async {
-  final dio = ref.read(dioProvider);
-  final selectedCommunity = ref.watch(selectedCommunityProvider);
-  try {
-    final response = await dio.get(
-        '${ApiConstants.getComplaintsEndpoint}/${selectedCommunity?.societyId}/${selectedCommunity?.apartmentId}',
-      );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = response.data["data"];
-      if (data.isEmpty) {
-        return [];
-      }
-      print(data);
-      return data.map((json) => TicketModel.fromJson(json)).toList();
-    } else {
-      throw Exception('Server error: ${response.statusCode}');
-    }
-  } on DioException catch (e) {
-    throw Exception(e.response?.data?['message'] ?? 'Failed to load complaints');
-  }
-});
 
 
-/*
+// final complaintProvider = FutureProvider.autoDispose<List<TicketModel>>((ref) async {
+//   final dio = ref.read(dioProvider);
+//   final selectedCommunity = ref.watch(selectedCommunityProvider);
+//   try {
+//     final response = await dio.get(
+//         '${ApiConstants.getComplaintsEndpoint}/${selectedCommunity?.societyId}/${selectedCommunity?.apartmentId}',
+//       );
+//     if (response.statusCode == 200) {
+//       final List<dynamic> data = response.data["data"];
+//       if (data.isEmpty) {
+//         return [];
+//       }
+//       print(data);
+//       return data.map((json) => TicketModel.fromJson(json)).toList();
+//     } else {
+//       throw Exception('Server error: ${response.statusCode}');
+//     }
+//   } on DioException catch (e) {
+//     throw Exception(e.response?.data?['message'] ?? 'Failed to load complaints');
+//   }
+// });
+
+  
+
 // complaint_provider.dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-import 'package:property_manager_app/src/core/constants/api_constants.dart';
-import 'package:property_manager_app/src/data/models/ticket_model.dart';
-import 'package:property_manager_app/src/presentation/providers/dio_provider.dart';
-import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
+
 
 class ComplaintNotifier extends AsyncNotifier<List<TicketModel>> {
   @override
@@ -73,7 +70,7 @@ class ComplaintNotifier extends AsyncNotifier<List<TicketModel>> {
         '${ApiConstants.getComplaintsEndpoint}/${selectedCommunity.societyId}/${selectedCommunity.apartmentId}',
       );
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+        final List<dynamic> data = response.data["data"];
         return data.map((json) => TicketModel.fromJson(json)).toList();
       } else {
         throw Exception('Server error: ${response.statusCode}');
@@ -93,4 +90,3 @@ final complaintProvider = AsyncNotifierProvider<ComplaintNotifier, List<TicketMo
   ComplaintNotifier.new,
 );
 
-*/

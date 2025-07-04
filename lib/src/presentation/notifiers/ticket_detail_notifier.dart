@@ -14,14 +14,14 @@ class TicketDetailNotifier extends FamilyAsyncNotifier<TicketDetailModel, String
     return await _ticketService.fetchTicketById(ticketId);
   }
 
-  Future<void> sendComment(String content, String visibility) async {
-    final newComment = await _ticketService.sendComment(arg, content, visibility);
-    if (state case AsyncData(:final value)) {
-      final updated = value.copyWith(
-        comments: [...value.comments, newComment],
-        responseCount: value.responseCount + 1,
-      );
-      state = AsyncData(updated);
-    }
+  Future<void> sendComment(Map<String, dynamic> body, List<String> filePaths) async {
+    // final newComment = await _ticketService.sendComment(body, filePaths);
+    // if (state case AsyncData(:final value)) {
+    //   final updated = value.copyWith(
+    //     comments: [...value.comments, newComment],
+    //     responseCount: value.responseCount + 1,
+    //   );
+    //   state = AsyncData(updated);
+    // }
   }
 }

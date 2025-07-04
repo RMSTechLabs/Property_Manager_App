@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:property_manager_app/src/core/constants/api_constants.dart';
-import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/dio/dio_client.dart';
+import 'package:property_manager_app/src/data/models/category_model.dart';
 import 'package:property_manager_app/src/data/models/ticket_detail_model.dart';
 import 'package:property_manager_app/src/data/services/complaint/complaint_service_impl.dart';
 import 'package:property_manager_app/src/presentation/providers/dio_provider.dart';
+import 'package:http_parser/http_parser.dart'; // Required for contentType
 
 class ComplaintService extends IComplaintService {
   final DioClient _dioClient;
@@ -32,28 +33,21 @@ class ComplaintService extends IComplaintService {
   ) async {
     final formData = FormData();
 
-    // Add JSON payload as a string part (simulate a file part)
+    // ✅ Send complaint JSON with correct Content-Type: application/json
     formData.files.add(
       MapEntry(
         'complaint',
         MultipartFile.fromString(
           jsonEncode(body),
-          filename: 'blob.json', // filename required for multipart
+          filename: 'complaint.json',
+          contentType: MediaType('application', 'json'), // ⬅️ FIXED!
         ),
       ),
     );
 
-    // Add files without contentType (Dio will infer from file extension)
+    // ✅ Attach each file with field name 'files'
     for (final path in filePaths) {
-      formData.files.add(
-        MapEntry(
-          'files',
-          await MultipartFile.fromFile(
-            path,
-            // no contentType specified
-          ),
-        ),
-      );
+      formData.files.add(MapEntry('files', await MultipartFile.fromFile(path),  ));
     }
 
     final response = await _dioClient.post(
@@ -61,6 +55,8 @@ class ComplaintService extends IComplaintService {
       data: formData,
       options: Options(headers: {'Content-Type': 'multipart/form-data'}),
     );
+
+    print('Complaint created: ${response.data}');
     return response;
   }
 
@@ -96,18 +92,20 @@ class ComplaintService extends IComplaintService {
   }
 
   @override
-  Future<Response> getAllCategoryList(String societyId) async {
+  Future<List<CategoryModel>> getAllCategoryList(String societyId) async {
     try {
       final response = await _dioClient.get(
         '${ApiConstants.getAllCategoryApi}/$societyId',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': 'Bearer YOUR_TOKEN', // optional if no interceptor
-          },
-        ),
       );
-      return response;
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to load categories');
+      }
+
+      final List<dynamic> dataList = response.data["data"];
+
+      // Assuming the response is a List of category objects
+      return dataList.map((json) => CategoryModel.fromJson(json)).toList();
     } catch (error) {
       throw Exception('Failed to fetch categories: $error');
     }

@@ -1,5 +1,6 @@
 // lib/src/domain/repositories/auth_repository.dart
 import 'package:dio/dio.dart';
+import 'package:property_manager_app/src/data/models/category_model.dart';
 import 'package:property_manager_app/src/data/models/ticket_detail_model.dart';
 
 abstract class IComplaintService {
@@ -13,7 +14,7 @@ abstract class IComplaintService {
     List<String> filePaths,
   );
   Future<Response> getCommentListByComplaintId(String complaintId);
-  Future<Response> getAllCategoryList(String societyId);
+  Future<List<CategoryModel>> getAllCategoryList(String societyId);
   Future<Response> getNoticeBySocietyAndAreaAndApartment({
     required String societyId,
     required String areaId,

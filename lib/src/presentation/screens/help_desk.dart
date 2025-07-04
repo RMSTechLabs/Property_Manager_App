@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:property_manager_app/src/data/models/ticket_model.dart';
 import 'package:property_manager_app/src/presentation/providers/complaint_provider.dart';
+import 'package:property_manager_app/src/presentation/screens/create_complaint_screen.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
-
+import 'package:property_manager_app/src/core/router/app_router.dart';
 class HelpDeskScreen extends ConsumerStatefulWidget {
   const HelpDeskScreen({super.key});
 
@@ -15,7 +16,8 @@ class HelpDeskScreen extends ConsumerStatefulWidget {
   ConsumerState<HelpDeskScreen> createState() => _HelpDeskScreenState();
 }
 
-class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
+class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
+    with RouteAware {
   bool _isLoading = true;
   String _selectedStatus = "All";
   List<TicketModel> _tickets = [];
@@ -33,7 +35,34 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
   @override
   void initState() {
     super.initState();
-    _loadTickets();
+    // _loadTickets();
+  }
+
+   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final ModalRoute? route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    await ref.read(complaintProvider.notifier).refreshComplaints();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when coming back to this screen
+    ref.read(complaintProvider.notifier).refreshComplaints();
   }
 
   Future<void> _loadTickets() async {
@@ -165,12 +194,16 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
                       Expanded(
                         child: complaints.when(
                           loading: () => _buildSkeletonLoader(screenWidth),
-                          error: (e, _) => Center(child: Text(e.toString())),
+                          error: (e, _) =>
+                              Center(child: Text('"Error:${e.toString()}')),
                           data: (tickets) {
                             final filtered = _getFilteredTickets(tickets);
-                            return filtered.isEmpty
-                                ? _buildEmptyState(screenWidth)
-                                : _buildTicketsList(filtered, screenWidth);
+                            return RefreshIndicator(
+                              onRefresh: _onRefresh,
+                              child: filtered.isEmpty
+                                  ? _buildEmptyState(screenWidth)
+                                  : _buildTicketsList(filtered, screenWidth),
+                            );
                           },
                         ),
                       ),
@@ -184,7 +217,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _createNewTicket(),
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: const Color(0xFF5A5FFF),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
@@ -224,12 +257,14 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          // IconButton(
-          //   onPressed: () {
-          //     // ref.refresh(complaintProvider);
-          //   },
-          //   icon: Icon(Icons.refresh, color: Colors.white, size: screenWidth * 0.06),
-          // )
+          IconButton(
+            onPressed: _onRefresh,
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.white,
+              size: screenWidth * 0.06,
+            ),
+          ),
         ],
       ),
     );
@@ -297,7 +332,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
   //   );
   // }
 
-    Widget _buildTicketsList(List<TicketModel> tickets, double screenWidth) {
+  Widget _buildTicketsList(List<TicketModel> tickets, double screenWidth) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
       itemCount: tickets.length,
@@ -309,22 +344,22 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
 
   Widget _buildTicketCard(TicketModel ticket, double screenWidth) {
     return Container(
-        margin: EdgeInsets.only(bottom: screenWidth * 0.04),
-        padding: EdgeInsets.all(screenWidth * 0.04),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: InkWell(
-      onTap: () => _onTicketTap(ticket.id),
-      child: Column(
+      margin: EdgeInsets.only(bottom: screenWidth * 0.04),
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => _onTicketTap(ticket.id),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Row
@@ -598,23 +633,28 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen> {
             SizedBox(
               width: double.infinity,
               height: screenWidth * 0.12,
-              child: ElevatedButton(
+              // child: ElevatedButton(
+              //   onPressed: () => _createNewTicket(),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: const Color(0xFF10B981),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     elevation: 0,
+              //   ),
+
+              //   child: Text(
+              //     "CREATE TICKET",
+              //     style: GoogleFonts.lato(
+              //       fontSize: screenWidth * 0.04,
+              //       fontWeight: FontWeight.w600,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
+              child: GradientButton(
                 onPressed: () => _createNewTicket(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  "CREATE TICKET",
-                  style: GoogleFonts.lato(
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+                label: "CREATE TICKET",
               ),
             ),
           ],

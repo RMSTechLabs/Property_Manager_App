@@ -126,7 +126,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         _buildReplyInput(
                           screenWidth,
                           onSend: (text) {
-                            notifier.sendComment(text, _selectedVisibility);
+                            // notifier.sendComment(text, _selectedVisibility);
                           },
                         ),
                       ],
@@ -599,72 +599,154 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     );
   }
 
+  // Widget _buildCommentItem(CommentModel comment, double screenWidth) {
+  //   return Container(
+  //     margin: EdgeInsets.only(bottom: screenWidth * 0.04),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         // Avatar
+  //         Container(
+  //           width: screenWidth * 0.1,
+  //           height: screenWidth * 0.1,
+  //           decoration: BoxDecoration(
+  //             color: Colors.grey.shade300,
+  //             borderRadius: BorderRadius.circular(screenWidth * 0.05),
+  //           ),
+  //           child: Icon(
+  //             Icons.person,
+  //             color: Colors.grey.shade600,
+  //             size: screenWidth * 0.05,
+  //           ),
+  //         ),
+
+  //         SizedBox(width: screenWidth * 0.03),
+
+  //         // Comment Content
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               // Author and timestamp
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         comment.authorName,
+  //                         style: GoogleFonts.lato(
+  //                           fontSize: screenWidth * 0.035,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: AppConstants.black,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         "(${comment.authorRole})",
+  //                         style: GoogleFonts.lato(
+  //                           fontSize: screenWidth * 0.03,
+  //                           color: const Color(0xFF10B981),
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   Text(
+  //                     comment.timestamp,
+  //                     style: GoogleFonts.lato(
+  //                       fontSize: screenWidth * 0.028,
+  //                       color: AppConstants.black50,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+
+  //               SizedBox(height: screenWidth * 0.02),
+
+  //               // Comment text
+  //               Text(
+  //                 comment.content,
+  //                 style: GoogleFonts.lato(
+  //                   fontSize: screenWidth * 0.035,
+  //                   color: AppConstants.black,
+  //                   height: 1.4,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildCommentItem(CommentModel comment, double screenWidth) {
-    return Container(
-      margin: EdgeInsets.only(bottom: screenWidth * 0.04),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Avatar
-          Container(
-            width: screenWidth * 0.1,
-            height: screenWidth * 0.1,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(screenWidth * 0.05),
-            ),
-            child: Icon(
-              Icons.person,
-              color: Colors.grey.shade600,
-              size: screenWidth * 0.05,
-            ),
+  return Container(
+    margin: EdgeInsets.only(bottom: screenWidth * 0.04),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Avatar
+        Container(
+          width: screenWidth * 0.1,
+          height: screenWidth * 0.1,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(screenWidth * 0.05),
           ),
+          child: Icon(
+            Icons.person,
+            color: Colors.grey.shade600,
+            size: screenWidth * 0.05,
+          ),
+        ),
 
-          SizedBox(width: screenWidth * 0.03),
+        SizedBox(width: screenWidth * 0.03),
 
-          // Comment Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Author and timestamp
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          comment.authorName,
-                          style: GoogleFonts.lato(
-                            fontSize: screenWidth * 0.035,
-                            fontWeight: FontWeight.w600,
-                            color: AppConstants.black,
-                          ),
+        // Comment Content
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Author and timestamp
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        comment.authorName,
+                        style: GoogleFonts.lato(
+                          fontSize: screenWidth * 0.035,
+                          fontWeight: FontWeight.w600,
+                          color: AppConstants.black,
                         ),
-                        Text(
-                          "(${comment.authorRole})",
-                          style: GoogleFonts.lato(
-                            fontSize: screenWidth * 0.03,
-                            color: const Color(0xFF10B981),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      comment.timestamp,
-                      style: GoogleFonts.lato(
-                        fontSize: screenWidth * 0.028,
-                        color: AppConstants.black50,
                       ),
+                      Text(
+                        "(${comment.authorRole})",
+                        style: GoogleFonts.lato(
+                          fontSize: screenWidth * 0.03,
+                          color: const Color(0xFF10B981),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    comment.timestamp,
+                    style: GoogleFonts.lato(
+                      fontSize: screenWidth * 0.028,
+                      color: AppConstants.black50,
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
 
-                SizedBox(height: screenWidth * 0.02),
+              SizedBox(height: screenWidth * 0.02),
 
-                // Comment text
+              // Comment text
+              if (comment.content.isNotEmpty)
                 Text(
                   comment.content,
                   style: GoogleFonts.lato(
@@ -673,13 +755,81 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     height: 1.4,
                   ),
                 ),
+
+              // Images (if any)
+              if (comment.images != null && comment.images.isNotEmpty) ...[
+                SizedBox(height: screenWidth * 0.02),
+                SizedBox(
+                  height: screenWidth * 0.25, // Height for image row
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: comment.images.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        margin: EdgeInsets.only(
+                          right: index < comment.images.length - 1 
+                            ? screenWidth * 0.02 
+                            : 0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                          child: Image.network(
+                            comment.images[index],
+                            width: screenWidth * 0.25,
+                            height: screenWidth * 0.25,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: screenWidth * 0.25,
+                                height: screenWidth * 0.25,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                                ),
+                                child: Icon(
+                                  Icons.error_outline,
+                                  color: Colors.grey.shade600,
+                                  size: screenWidth * 0.06,
+                                ),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: screenWidth * 0.25,
+                                height: screenWidth * 0.25,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: screenWidth * 0.05,
+                                    height: screenWidth * 0.05,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildReplyInput(
     double screenWidth, {

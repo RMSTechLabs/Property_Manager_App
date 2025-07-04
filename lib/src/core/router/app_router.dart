@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:property_manager_app/src/presentation/screens/create_complaint_screen.dart';
@@ -24,6 +25,7 @@ class AuthRefreshNotifier extends ChangeNotifier {
     });
   }
 }
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   // final authNotifier = ValueNotifier<AsyncValue<void>>(const AsyncLoading());
@@ -33,6 +35,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   // });
   final authNotifier = AuthRefreshNotifier(ref); // 👈 Updated
   return GoRouter(
+    observers: [routeObserver], // ✅ Register here, not in MaterialApp
     // initialLocation: '/onboarding',
     initialLocation: '/splash',
 
