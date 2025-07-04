@@ -99,7 +99,7 @@ class ComplaintService extends IComplaintService {
   Future<Response> getAllCategoryList(String societyId) async {
     try {
       final response = await _dioClient.get(
-        '${AppConstants.getAllCategoryApi}/$societyId',
+        '${ApiConstants.getAllCategoryApi}/$societyId',
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ class ComplaintService extends IComplaintService {
   Future<Response> getCommentListByComplaintId(String complaintId) async {
     try {
       final response = await _dioClient.get(
-        '${AppConstants.getCommentList}/$complaintId',
+        '${ApiConstants.getCommentList}/$complaintId',
         options: Options(
           headers: {
             'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ class ComplaintService extends IComplaintService {
   }) async {
     try {
       final response = await _dioClient.get(
-        '${AppConstants.getFilteredNotices}',
+        ApiConstants.getFilteredNotices,
         queryParameters: {
           'societyId': societyId,
           'areaId': areaId,
