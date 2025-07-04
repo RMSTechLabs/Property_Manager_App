@@ -18,6 +18,13 @@ class ApiConstants {
       '/master/resident-society-details';
   static const String getComplaintsEndpoint = '/complaints/all-complaint';
   static const String getComplaintEndpoint = '/complaints';
+  static const String addComplaintEndpoint = '/complaints';
+
+  static const String getAllCategoryApi = "/category/category-list";
+  static const String postComment = '/master/send-comments';
+  static const String postCommentWithImage = '/master/send-comments-with-image';
+  static const String getCommentList = '/master/comment-list';
+  static const String getFilteredNotices = '/notice/app/get-notices';
 
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));
