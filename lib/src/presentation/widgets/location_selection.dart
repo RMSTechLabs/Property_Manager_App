@@ -5,15 +5,18 @@ import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 import 'package:property_manager_app/src/data/models/location_model.dart';
 import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
+
 // Location Selection Screen
 class LocationSelectionScreen extends ConsumerStatefulWidget {
   const LocationSelectionScreen({super.key});
 
   @override
-  ConsumerState<LocationSelectionScreen> createState() => _LocationSelectionScreenState();
+  ConsumerState<LocationSelectionScreen> createState() =>
+      _LocationSelectionScreenState();
 }
 
-class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScreen> {
+class _LocationSelectionScreenState
+    extends ConsumerState<LocationSelectionScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<LocationModel> _filteredLocations = [];
   List<LocationModel> _allLocations = [];
@@ -29,19 +32,21 @@ class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScree
   void _loadLocations() async {
     try {
       final societyState = ref.read(societyStateProvider);
-      
+
       // Extract locations from society data
       if (societyState.societies.isNotEmpty) {
         setState(() {
-          _allLocations = societyState.societies.map((society) => 
-            LocationModel(
-              id: society.id ?? "1", 
-              locationName: "${society.block}-${society.flat}",
-              apartmentId:society.apartmentId ?? "1",
-              areaId: society.areaId ?? "1",
-              societyId: society.societyId ?? "1"
-            )
-          ).toList();
+          _allLocations = societyState.societies
+              .map(
+                (society) => LocationModel(
+                  id: society.id ?? "1",
+                  locationName: "${society.block}-${society.flat}",
+                  apartmentId: society.apartmentId ?? "1",
+                  areaId: society.areaId ?? "1",
+                  societyId: society.societyId ?? "1",
+                ),
+              )
+              .toList();
           _filteredLocations = List.from(_allLocations);
           _isLoading = false;
         });
@@ -70,7 +75,9 @@ class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScree
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredLocations = _allLocations
-          .where((location) => location.locationName.toLowerCase().contains(query))
+          .where(
+            (location) => location.locationName.toLowerCase().contains(query),
+          )
           .toList();
     });
   }
@@ -90,7 +97,7 @@ class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScree
             children: [
               // Header
               _buildHeader(screenWidth),
-              
+
               // Locations List
               Expanded(
                 child: Container(
@@ -106,10 +113,10 @@ class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScree
                     children: [
                       // Search Bar
                       _buildSearchBar(screenWidth),
-                      
+
                       // Locations List
                       Expanded(
-                        child: _isLoading 
+                        child: _isLoading
                             ? const Center(child: CircularProgressIndicator())
                             : _buildLocationsList(screenWidth),
                       ),
@@ -183,19 +190,38 @@ class _LocationSelectionScreenState extends ConsumerState<LocationSelectionScree
           fontSize: screenWidth * 0.04,
           color: AppConstants.black,
         ),
-        decoration: InputDecoration(
-          hintText: "Search locations...",
-          hintStyle: GoogleFonts.lato(
-            fontSize: screenWidth * 0.04,
-            color: AppConstants.black50,
-          ),
-          border: InputBorder.none,
-          suffixIcon: Icon(
-            Icons.search,
-            color: AppConstants.black50,
-            size: screenWidth * 0.05,
-          ),
-        ),
+        decoration:
+            InputDecoration(
+              hintText: "Search locations...",
+              hintStyle: GoogleFonts.lato(
+                fontSize: screenWidth * 0.04,
+                color: AppConstants.black50,
+              ),
+              border: InputBorder.none,
+              //add
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              isDense: true,
+              //add
+              suffixIcon: Icon(
+                Icons.search,
+                color: AppConstants.black50,
+                size: screenWidth * 0.05,
+              ),
+            ).copyWith(
+              hintStyle: GoogleFonts.lato(
+                fontSize: screenWidth * 0.04,
+                color: AppConstants.black50,
+              ),
+              suffixIcon: Icon(
+                Icons.search,
+                color: AppConstants.black50,
+                size: screenWidth * 0.05,
+              ),
+            ),
       ),
     );
   }

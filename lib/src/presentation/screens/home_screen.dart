@@ -141,6 +141,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   padding: EdgeInsets.all(screenWidth * 0.05),
                   child: Row(
                     children: [
+                      // Container(
+                      //   width: screenWidth * 0.12,
+                      //   height: screenWidth * 0.12,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white.withOpacity(0.2),
+                      //     borderRadius: BorderRadius.circular(
+                      //       screenWidth * 0.06,
+                      //     ),
+                      //   ),
+                      //   child: Icon(
+                      //     Icons.home_outlined,
+                      //     color: Colors.white,
+                      //     size: screenWidth * 0.06,
+                      //   ),
+                      // ),
                       Container(
                         width: screenWidth * 0.12,
                         height: screenWidth * 0.12,
@@ -150,12 +165,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             screenWidth * 0.06,
                           ),
                         ),
-                        child: Icon(
-                          Icons.home_outlined,
-                          color: Colors.white,
-                          size: screenWidth * 0.06,
+                        child: Padding(
+                          padding: EdgeInsets.all(
+                            screenWidth * 0.02,
+                          ), // optional: to give some inner spacing
+                          child: Image.asset(
+                            'assets/images/logo.png', // change this path to your image asset
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
+
                       SizedBox(width: screenWidth * 0.03),
                       Expanded(
                         child: _isLoading
@@ -754,4 +774,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 }
-

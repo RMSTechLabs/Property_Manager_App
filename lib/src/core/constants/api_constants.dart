@@ -22,8 +22,11 @@ class ApiConstants {
 
   static const String getAllCategoryApi = "/category/category-list";
   static const String postComment = '/master/send-comments';
-  static const String postCommentWithImage = '/master/send-comments-with-image';
-  static const String getCommentList = '/master/comment-list';
+  static const String sendCommentWithImageEndpoint =
+      '/master/send-comments-with-image';
+  static const String getCommentListByComplaintIdEndpoint =
+      '/master/comment-list';
+
   static const String getFilteredNotices = '/notice/app/get-notices';
 
   static Duration get connectTimeout =>

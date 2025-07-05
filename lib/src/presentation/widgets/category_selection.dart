@@ -183,19 +183,38 @@ class _CategorySelectionScreenState
           fontSize: screenWidth * 0.04,
           color: AppConstants.black,
         ),
-        decoration: InputDecoration(
-          hintText: "Search categories...",
-          hintStyle: GoogleFonts.lato(
-            fontSize: screenWidth * 0.04,
-            color: AppConstants.black50,
-          ),
-          border: InputBorder.none,
-          suffixIcon: Icon(
-            Icons.search,
-            color: AppConstants.black50,
-            size: screenWidth * 0.05,
-          ),
-        ),
+        decoration:
+            InputDecoration(
+              hintText: "Search categories...",
+              hintStyle: GoogleFonts.lato(
+                fontSize: screenWidth * 0.04,
+                color: AppConstants.black50,
+              ),
+              border: InputBorder.none,
+              //add
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              isDense: true,
+              //add
+              suffixIcon: Icon(
+                Icons.search,
+                color: AppConstants.black50,
+                size: screenWidth * 0.05,
+              ),
+            ).copyWith(
+              hintStyle: GoogleFonts.lato(
+                fontSize: screenWidth * 0.04,
+                color: AppConstants.black50,
+              ),
+              suffixIcon: Icon(
+                Icons.search,
+                color: AppConstants.black50,
+                size: screenWidth * 0.05,
+              ),
+            ),
       ),
     );
   }

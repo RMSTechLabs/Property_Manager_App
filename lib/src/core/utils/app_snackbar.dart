@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppSnackBar {
-  
   static void showError({
     required BuildContext context,
     required String message,
@@ -75,6 +75,23 @@ class AppSnackBar {
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 2),
         dismissDirection: DismissDirection.horizontal,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  static void showInfo({
+    required BuildContext context,
+    required String message,
+  }) {
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.lato(color: Colors.white)),
+        backgroundColor: Colors.blue,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );

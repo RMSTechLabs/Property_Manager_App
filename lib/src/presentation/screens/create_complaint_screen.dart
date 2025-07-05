@@ -979,11 +979,10 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
       // );
       if (mounted) {
         AppSnackBar.showSuccess(
-        context: context,
-        message: 'Image removed successfully',
-      ); 
+          context: context,
+          message: 'Image removed successfully',
+        );
       }
-      
     }
   }
 

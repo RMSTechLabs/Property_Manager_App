@@ -47,7 +47,7 @@ class ComplaintService extends IComplaintService {
 
     // ✅ Attach each file with field name 'files'
     for (final path in filePaths) {
-      formData.files.add(MapEntry('files', await MultipartFile.fromFile(path),  ));
+      formData.files.add(MapEntry('files', await MultipartFile.fromFile(path)));
     }
 
     final response = await _dioClient.post(
@@ -115,7 +115,7 @@ class ComplaintService extends IComplaintService {
   Future<Response> getCommentListByComplaintId(String complaintId) async {
     try {
       final response = await _dioClient.get(
-        '${ApiConstants.getCommentList}/$complaintId',
+        '${ApiConstants.getCommentListByComplaintIdEndpoint}/$complaintId',
         options: Options(
           headers: {
             'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import 'package:property_manager_app/src/core/utils/app_helper.dart';
+import 'package:property_manager_app/src/data/models/comment_model.dart';
 
 class TicketDetailModel {
   final String id;
@@ -13,6 +14,7 @@ class TicketDetailModel {
   final String createdBy;
   final String community;
   final List<String> imageUrls;
+  final String societyId;
   final List<CommentModel> comments;
 
   TicketDetailModel({
@@ -29,6 +31,7 @@ class TicketDetailModel {
     required this.community,
     required this.imageUrls,
     required this.comments,
+    required this.societyId,
   });
 
   factory TicketDetailModel.fromJson(Map<String, dynamic> json) {
@@ -37,9 +40,12 @@ class TicketDetailModel {
       title: json['data']['category']['category'] ?? '',
       category: json['data']['category']['category'] ?? '',
       status: json['data']['ticketStatus'] ?? '',
-      timestamp: AppHelper.formatComplaintTimestamp(json['data']['createdAt'] ?? ''),
+      timestamp: AppHelper.formatComplaintTimestamp(
+        json['data']['createdAt'] ?? '',
+      ),
       description: json['data']['complaintDescription'] ?? '',
-      location: '${json['data']['apartment']["block"]}-${json['data']['apartment']["flat"]}',
+      location:
+          '${json['data']['apartment']["block"]}-${json['data']['apartment']["flat"]}',
       assignee: json['data']['assignedUser']['name'] ?? '',
       responseCount: (json['data']['comments'] as List?)?.length ?? 0,
       createdBy: json['data']['complainer']["name"] ?? 'user',
@@ -50,6 +56,7 @@ class TicketDetailModel {
       comments: (json['data']['comments'] as List<dynamic>? ?? [])
           .map((comment) => CommentModel.fromJson(comment))
           .toList(),
+      societyId: json['data']['society']['id'].toString(),
     );
   }
 
@@ -67,6 +74,7 @@ class TicketDetailModel {
       'createdBy': createdBy,
       'community': community,
       'imageUrls': imageUrls,
+      'societyId': societyId,
       'comments': comments.map((comment) => comment.toJson()).toList(),
     };
   }
@@ -85,6 +93,7 @@ class TicketDetailModel {
     String? community,
     List<String>? imageUrls,
     List<CommentModel>? comments,
+    String? societyId,
   }) {
     return TicketDetailModel(
       id: id ?? this.id,
@@ -100,72 +109,73 @@ class TicketDetailModel {
       community: community ?? this.community,
       imageUrls: imageUrls ?? this.imageUrls,
       comments: comments ?? this.comments,
+      societyId: societyId ?? this.societyId,
     );
   }
 }
 
-class CommentModel {
-  final String id;
-  final String authorName;
-  final String authorRole;
-  final String timestamp;
-  final String content;
-  final bool isSystemMessage;
-  final List<String> images;
+// class CommentModel {
+//   final String id;
+//   final String authorName;
+//   final String authorRole;
+//   final String timestamp;
+//   final String content;
+//   final bool isSystemMessage;
+//   final List<String> images;
 
-  CommentModel({
-    required this.id,
-    required this.authorName,
-    required this.authorRole,
-    required this.timestamp,
-    required this.content,
-    this.isSystemMessage = false,
-    this.images = const [],
-  });
+//   CommentModel({
+//     required this.id,
+//     required this.authorName,
+//     required this.authorRole,
+//     required this.timestamp,
+//     required this.content,
+//     this.isSystemMessage = false,
+//     this.images = const [],
+//   });
 
-  factory CommentModel.fromJson(Map<String, dynamic> json) {
-    return CommentModel(
-      id: json['id'].toString(),
-      authorName:'Monish Paul', //json['authorName'] ?? '',
-      authorRole: 'Admin', //json['authorRole'] ?? '',
-      timestamp: AppHelper.formatComplaintTimestamp(json['createdAt'] ?? ''),
-      content: json['comments'] ?? '',
-      isSystemMessage: false,//json['isSystemMessage'] ?? false,
-      images: (json['images'] as List<dynamic>? ?? [])
-          .map((image) => image['imageUrl'].toString())
-          .toList(),
-    );
-  }
+//   factory CommentModel.fromJson(Map<String, dynamic> json) {
+//     return CommentModel(
+//       id: json['id'].toString(),
+//       authorName:'Monish Paul', //json['authorName'] ?? '',
+//       authorRole: 'Admin', //json['authorRole'] ?? '',
+//       timestamp: AppHelper.formatComplaintTimestamp(json['createdAt'] ?? ''),
+//       content: json['comments'] ?? '',
+//       isSystemMessage: false,//json['isSystemMessage'] ?? false,
+//       images: (json['images'] as List<dynamic>? ?? [])
+//           .map((image) => image['imageUrl'].toString())
+//           .toList(),
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'authorName': authorName,
-      'authorRole': authorRole,
-      'timestamp': timestamp,
-      'content': content,
-      'isSystemMessage': isSystemMessage,
-      'images': images,
-    };
-  }
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': id,
+//       'authorName': authorName,
+//       'authorRole': authorRole,
+//       'timestamp': timestamp,
+//       'content': content,
+//       'isSystemMessage': isSystemMessage,
+//       'images': images,
+//     };
+//   }
 
-  CommentModel copyWith({
-    String? id,
-    String? authorName,
-    String? authorRole,
-    String? timestamp,
-    String? content,
-    bool? isSystemMessage,
-    List<String>? images,
-  }) {
-    return CommentModel(
-      id: id ?? this.id,
-      authorName: authorName ?? this.authorName,
-      authorRole: authorRole ?? this.authorRole,
-      timestamp: timestamp ?? this.timestamp,
-      content: content ?? this.content,
-      isSystemMessage: isSystemMessage ?? this.isSystemMessage,
-      images: images ?? this.images,
-    );
-  }
-}
+//   CommentModel copyWith({
+//     String? id,
+//     String? authorName,
+//     String? authorRole,
+//     String? timestamp,
+//     String? content,
+//     bool? isSystemMessage,
+//     List<String>? images,
+//   }) {
+//     return CommentModel(
+//       id: id ?? this.id,
+//       authorName: authorName ?? this.authorName,
+//       authorRole: authorRole ?? this.authorRole,
+//       timestamp: timestamp ?? this.timestamp,
+//       content: content ?? this.content,
+//       isSystemMessage: isSystemMessage ?? this.isSystemMessage,
+//       images: images ?? this.images,
+//     );
+//   }
+// }
