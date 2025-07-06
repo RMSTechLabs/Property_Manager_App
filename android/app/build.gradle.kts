@@ -2,17 +2,19 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("com.google.gms.google-services")//Add this line
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.property_manager_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "29.0.13599879"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true//Add this line
     }
 
     kotlinOptions {
@@ -21,13 +23,14 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.property_manager_app"
+        applicationId = "com.propertymanageruae"//"com.example.property_manager_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 21//flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true //Add this line
     }
 
     buildTypes {
@@ -37,8 +40,24 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // ✅ Add this block here:
+    buildFeatures {
+        viewBinding = true
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")//Add this line
+  implementation("androidx.core:core-ktx:1.10.1")//Add this line
+  implementation("androidx.multidex:multidex:2.0.1")//Add this line
 }

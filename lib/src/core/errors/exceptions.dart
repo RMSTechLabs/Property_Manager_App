@@ -64,3 +64,13 @@ class TimeoutException implements Exception {
   @override
   String toString() => 'TimeoutException: $message';
 }
+
+// lib/src/core/errors/exceptions.dart
+class NotificationException implements Exception {
+  final String message;
+  
+  const NotificationException(this.message);
+  
+  @override
+  String toString() => 'NotificationException: $message';
+}

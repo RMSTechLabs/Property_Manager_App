@@ -1497,27 +1497,28 @@
 //   }
 // }
 
-// Enhanced Ticket Detail Screen with Comment File Attachments
+
+// Enhanced Ticket Detail Screen with Separate Comments Provider
 import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 import 'package:property_manager_app/src/data/models/comment_model.dart';
+import 'package:property_manager_app/src/data/models/ticket_detail_model.dart';
 import 'package:property_manager_app/src/data/services/comment/comment_service_impl.dart';
-import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
 import 'package:property_manager_app/src/presentation/providers/ticket_detail_provider.dart';
 import 'package:property_manager_app/src/presentation/widgets/image_viewer.dart';
 import 'package:redacted/redacted.dart';
-import 'package:property_manager_app/src/core/constants/app_constants.dart';
-import 'package:property_manager_app/src/data/models/ticket_detail_model.dart';
-import 'package:property_manager_app/src/data/services/comment/comment_service.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:property_manager_app/src/presentation/providers/comments_provider.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final String ticketId;
@@ -1708,8 +1709,8 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
           SizedBox(height: screenWidth * 0.04),
 
-          // Comments Section
-          _buildCommentsSection(screenWidth, ticketDetail),
+          // Comments Section - Now using separate comments provider
+          _buildCommentsSection(screenWidth),
         ],
       ),
     );
@@ -2002,6 +2003,13 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     double screenWidth,
     TicketDetailModel? ticketDetail,
   ) {
+    // Watch comments to get accurate response count
+    final commentsAsyncValue = ref.watch(commentsProvider(ticketId));
+    final responseCount = commentsAsyncValue.maybeWhen(
+      data: (comments) => comments.length,
+      orElse: () => ticketDetail?.responseCount ?? 0,
+    );
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
       decoration: BoxDecoration(
@@ -2022,7 +2030,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               ),
               SizedBox(width: screenWidth * 0.02),
               Text(
-                "${ticketDetail?.responseCount ?? 0} Responses",
+                "$responseCount Responses",
                 style: GoogleFonts.lato(
                   fontSize: screenWidth * 0.035,
                   color: AppConstants.black50,
@@ -2042,10 +2050,10 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     );
   }
 
-  Widget _buildCommentsSection(
-    double screenWidth,
-    TicketDetailModel? ticketDetail,
-  ) {
+  // Updated Comments Section - now uses separate comments provider
+  Widget _buildCommentsSection(double screenWidth) {
+    final commentsAsyncValue = ref.watch(commentsProvider(ticketId));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2072,23 +2080,61 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
         SizedBox(height: screenWidth * 0.04),
 
-        // Comments Section
-        ...((ticketDetail?.comments ?? []).isNotEmpty
-            ? (ticketDetail!.comments).map(
-                (comment) => _buildCommentItem(comment, screenWidth),
-              )
-            : [
-                Center(
-                  child: Text(
-                    "No comments yet.",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      color: Colors.grey,
-                      fontStyle: FontStyle.italic,
-                    ),
+        // Comments Section with AsyncValue handling
+        commentsAsyncValue.when(
+          loading: () => _buildCommentsSkeletonLoader(screenWidth),
+          error: (error, _) => Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: screenWidth * 0.1,
+                  color: Colors.red,
+                ),
+                SizedBox(height: screenWidth * 0.02),
+                Text(
+                  "Failed to load comments",
+                  style: GoogleFonts.lato(
+                    fontSize: screenWidth * 0.035,
+                    color: Colors.red,
                   ),
                 ),
-              ]),
+                SizedBox(height: screenWidth * 0.02),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.invalidate(commentsProvider(ticketId));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF5A5FFF),
+                  ),
+                  child: Text(
+                    "Retry",
+                    style: GoogleFonts.lato(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          data: (comments) => comments.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.1),
+                    child: Text(
+                      "No comments yet.",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                )
+              : Column(
+                  children: comments
+                      .map((comment) => _buildCommentItem(comment, screenWidth))
+                      .toList(),
+                ),
+        ),
 
         SizedBox(height: screenWidth * 0.1), // Space for fixed input
       ],
@@ -2233,32 +2279,31 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                                   },
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Container(
-                                          width: screenWidth * 0.25,
-                                          height: screenWidth * 0.25,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius: BorderRadius.circular(
-                                              screenWidth * 0.02,
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      width: screenWidth * 0.25,
+                                      height: screenWidth * 0.25,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(
+                                          screenWidth * 0.02,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: screenWidth * 0.05,
+                                          height: screenWidth * 0.05,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              Colors.grey.shade600,
                                             ),
                                           ),
-                                          child: Center(
-                                            child: SizedBox(
-                                              width: screenWidth * 0.05,
-                                              height: screenWidth * 0.05,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                      Color
-                                                    >(Colors.grey.shade600),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -2364,24 +2409,24 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 SizedBox(width: screenWidth * 0.02),
 
                 // Voice button
-                GestureDetector(
-                  onTap: () => _recordVoice(),
-                  child: Container(
-                    width: screenWidth * 0.1,
-                    height: screenWidth * 0.1,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(screenWidth * 0.05),
-                    ),
-                    child: Icon(
-                      Icons.mic,
-                      color: AppConstants.black50,
-                      size: screenWidth * 0.05,
-                    ),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () => _recordVoice(),
+                //   child: Container(
+                //     width: screenWidth * 0.1,
+                //     height: screenWidth * 0.1,
+                //     decoration: BoxDecoration(
+                //       color: Colors.grey.shade200,
+                //       borderRadius: BorderRadius.circular(screenWidth * 0.05),
+                //     ),
+                //     child: Icon(
+                //       Icons.mic,
+                //       color: AppConstants.black50,
+                //       size: screenWidth * 0.05,
+                //     ),
+                //   ),
+                // ),
 
-                SizedBox(width: screenWidth * 0.02),
+                // SizedBox(width: screenWidth * 0.02),
 
                 // Send button
                 GestureDetector(
@@ -2511,6 +2556,13 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // Comments skeleton loader
+  Widget _buildCommentsSkeletonLoader(double screenWidth) {
+    return Column(
+      children: List.generate(3, (index) => _buildSkeletonComment(screenWidth)),
     );
   }
 
@@ -2807,8 +2859,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     AppSnackBar.showError(context: context, message: message);
   }
 
-  // Comment Submission with Database Refresh
-
+  // Updated Comment Submission - now refreshes comments provider instead of ticket detail
   Future<void> _sendComment(dynamic notifier, String societyId) async {
     final text = _replyController.text.trim();
 
@@ -2847,8 +2898,8 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
           message: 'Comment sent successfully!',
         );
 
-        // Refresh ticket detail from database
-        ref.invalidate(ticketDetailProvider(ticketId));
+        // Refresh comments from database using separate provider
+        ref.invalidate(commentsProvider(ticketId));
 
         // Scroll to bottom to show new comment
         Future.delayed(const Duration(milliseconds: 500), () {

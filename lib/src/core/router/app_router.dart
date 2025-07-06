@@ -6,6 +6,8 @@ import 'package:property_manager_app/src/presentation/screens/create_complaint_s
 import 'package:property_manager_app/src/presentation/screens/help_desk.dart';
 import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/login_screen.dart';
+import 'package:property_manager_app/src/presentation/screens/notice_board_screen.dart';
+import 'package:property_manager_app/src/presentation/screens/notice_detail_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/onboarding_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/profile_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/setting_screen.dart';
@@ -120,6 +122,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, _) => const HelpDeskScreen(),
       ),
       GoRoute(
+        path: '/notice_board',
+        name: 'notice_board',
+        builder: (context, _) => const NoticeBoardScreen(),
+      ),
+      GoRoute(
+        path: '/notice_board/:id',
+        name: 'noticeDetail',
+        builder: (context, state) {
+          final noticeId = state.pathParameters['id']!;
+          return NoticeDetailScreen(noticeId: noticeId);
+        },
+      ),
+       GoRoute(
         path: '/ticket/:id',
         name: 'ticketDetail',
         builder: (context, state) {

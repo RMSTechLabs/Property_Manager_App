@@ -18,6 +18,7 @@ class ApiConstants {
       '/master/resident-society-details';
   static const String getComplaintsEndpoint = '/complaints/all-complaint';
   static const String getComplaintEndpoint = '/complaints';
+  static const String getNoticeEndpoint = '/notice';
   static const String addComplaintEndpoint = '/complaints';
 
   static const String getAllCategoryApi = "/category/category-list";
@@ -27,7 +28,7 @@ class ApiConstants {
   static const String getCommentListByComplaintIdEndpoint =
       '/master/comment-list';
 
-  static const String getFilteredNotices = '/notice/app/get-notices';
+  static const String getNoticesEndpoint = '/notice/app/get-notices';
 
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));

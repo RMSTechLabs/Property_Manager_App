@@ -1,5 +1,6 @@
 // lib/main.dart
 import 'dart:ui';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,10 +8,28 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'src/app.dart';
 import 'src/core/utils/app_lifecycle_handler.dart';
 import 'src/core/utils/background_task_handler.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
+// Background message handler must be a top-level function
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Initialize Firebase if not already initialized
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print('📱 Background message: ${message.messageId}');
+}
+
+// final sharedPrefs = await SharedPreferences.getInstance();
 void main() async {
   // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print('🔥 Firebase initialized successfully');
+
+  // Set background message handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // Initialize error handling
   await _initializeErrorHandling();
@@ -22,7 +41,12 @@ void main() async {
   await _configureSystemUI();
 
   // Run the app with proper error boundary
-  runApp(ProviderScope(child: const PropertyManagerApp()));
+  runApp(
+    ProviderScope(
+      // overrides: [sharedPreferencesProvider.overrideWithValue(sharedPrefs)],
+      child: const PropertyManagerApp(),
+    ),
+  );
 }
 
 /// Initialize global error handling
@@ -113,7 +137,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
       BackgroundTaskHandler.initialize(ref);
 
       // Mark as initialized
-      if (!mounted) return;//
+      if (!mounted) return; //
       setState(() {
         _isInitialized = true;
       });
@@ -123,7 +147,7 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
       _logError('App Initialization Error', e, stackTrace);
 
       // Still mark as initialized to prevent infinite loading
-      if (!mounted) return;//
+      if (!mounted) return; //
       setState(() {
         _isInitialized = true;
       });

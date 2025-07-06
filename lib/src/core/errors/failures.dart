@@ -29,3 +29,9 @@ class ValidationFailure extends Failure {
   const ValidationFailure(super.message);
 }
 
+
+
+
+class NotificationFailure extends Failure {
+  const NotificationFailure(super.message);
+}

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:property_manager_app/src/presentation/providers/notification_provider.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/utils/app_lifecycle_handler.dart';
@@ -40,6 +41,16 @@ class _AppState extends ConsumerState<App> {
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final locale = ref.watch(localeProvider);
+
+    // 🔔 This will initialize notifications when the app starts
+    ref.listen<NotificationState>(notificationProvider, (previous, next) {
+      if (next.error != null) {
+        print('❌ Notification error: ${next.error}');
+      }
+      if (next.fcmToken != null) {
+        print('🎯 FCM Token received in app: ${next.fcmToken}');
+      }
+    });
 
     return ErrorBoundary(
       child: MaterialApp.router(

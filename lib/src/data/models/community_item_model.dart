@@ -6,6 +6,7 @@ class CommunityItem {
   final String ownerOrTenantName;
   final String societyId;
   final String apartmentId;
+  final String areaId;
 
   CommunityItem({
     required this.id,
@@ -14,5 +15,6 @@ class CommunityItem {
     required this.ownerOrTenantName,
     required this.societyId,
     required this.apartmentId,
+    required this.areaId,
   });
 }

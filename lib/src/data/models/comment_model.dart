@@ -25,8 +25,8 @@ class CommentModel {
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
       id: json['id'].toString(),
-      authorName: 'Monish Paul', //json['authorName'] ?? '',
-      authorRole: 'Admin', //json['authorRole'] ?? '',
+      authorName: json['person']?['name'] ?? 'Unknown', //json['authorName'] ?? '',
+      authorRole: 'Resident', //json['authorRole'] ?? '',
       timestamp: AppHelper.formatComplaintTimestamp(json['createdAt'] ?? ''),
       content: json['comments'] ?? '',
       isSystemMessage: false, //json['isSystemMessage'] ?? false,

@@ -93,12 +93,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return CommunityItem(
         id: society.id ?? 'unknown',
         name:
-            '${society.block ?? ''}-${society.flat ?? ''}-${society.societyId ?? ''}-${society.apartmentId ?? ''},${society.block},${society.society}'
+            '${society.block ?? ''}-${society.flat ?? ''}-${society.societyId ?? ''}-${society.areaId ?? ''}-${society.apartmentId ?? ''},${society.block},${society.society}'
                 .trim(),
         residentType: society.residentType ?? 'Unknown',
         ownerOrTenantName: ownerOrTenantName,
         societyId: society.societyId?.toString() ?? '',
         apartmentId: society.apartmentId?.toString() ?? '',
+        areaId: society.areaId?.toString() ?? '',
       );
     }).toList();
   }
@@ -760,7 +761,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _navigateToNoticeBoard() {
-    print('Navigate to Notice Board');
+    context.push('/notice_board');
   }
 
   void _navigateToAmenities() {

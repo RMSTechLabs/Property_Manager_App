@@ -137,7 +137,7 @@ class ComplaintService extends IComplaintService {
   }) async {
     try {
       final response = await _dioClient.get(
-        ApiConstants.getFilteredNotices,
+        ApiConstants.getNoticesEndpoint,
         queryParameters: {
           'societyId': societyId,
           'areaId': areaId,
