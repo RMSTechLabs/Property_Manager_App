@@ -11,6 +11,7 @@ class ApiConstants {
 
   static const String loginEndpoint = '/auth/authenticate';
   static const String refreshTokenEndpoint = '/auth/refresh-token';
+  static const String logoutEndpoint = '/auth/logout';
   static const String userProfileEndpoint = '/auth/me';
   static const String sendOtpEndpoint = "/auth/send-otp";
   static const String validateOtpEndpoint = "/auth/validate-otp";
@@ -29,6 +30,10 @@ class ApiConstants {
       '/master/comment-list';
 
   static const String getNoticesEndpoint = '/notice/app/get-notices';
+  // FCM endpoints
+  static const String registerDeviceEndpoint = '/devices/register';
+  static const String updateDeviceTokenEndpoint = '/devices/update-token';
+  static const String unregisterDeviceEndpoint = '/devices/unregister';
 
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));

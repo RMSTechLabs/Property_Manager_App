@@ -1,35 +1,37 @@
 // Profile Screen - Responsive with Loading States
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isLoading = true;
   UserProfile? userProfile;
-  
+
   @override
   void initState() {
     super.initState();
     _loadUserProfile();
   }
-  
+
   Future<void> _loadUserProfile() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     // Simulate API call
     await Future.delayed(const Duration(seconds: 2));
-    
+
     setState(() {
       userProfile = UserProfile(
         name: "Gopal prasad",
@@ -48,12 +50,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isLoading = false;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -65,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // Header
               _buildHeader(screenWidth),
-              
+
               // Scrollable Content
               Expanded(
                 child: Container(
@@ -83,57 +85,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // User Profile Card
-                        _isLoading 
-                          ? _buildSkeletonUserCard(screenWidth)
-                          : _buildUserProfileCard(screenWidth),
-                        
+                        _isLoading
+                            ? _buildSkeletonUserCard(screenWidth)
+                            : _buildUserProfileCard(screenWidth),
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // My Flats Section
-                        _buildSectionHeader("MY FLATS", "Add/Manage Flat", screenWidth),
+                        _buildSectionHeader(
+                          "MY FLATS",
+                          "Add/Manage Flat",
+                          screenWidth,
+                        ),
                         SizedBox(height: screenWidth * 0.03),
-                        
-                        _isLoading 
-                          ? _buildSkeletonPropertyCard(screenWidth)
-                          : _buildPropertyCard(screenWidth),
-                        
+
+                        _isLoading
+                            ? _buildSkeletonPropertyCard(screenWidth)
+                            : _buildPropertyCard(screenWidth),
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Quick Actions Grid
-                        _isLoading 
-                          ? _buildSkeletonQuickActions(screenWidth)
-                          : _buildQuickActionsGrid(screenWidth),
-                        
+                        _isLoading
+                            ? _buildSkeletonQuickActions(screenWidth)
+                            : _buildQuickActionsGrid(screenWidth),
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Documents Section
                         _buildDocumentsSection(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Settings and IVR
                         _buildSettingsSection(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Support Section
                         _buildSupportSection(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Others Section
                         _buildOthersSection(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.06),
-                        
+
                         // Profile Actions
                         _buildProfileActions(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.08),
-                        
+
                         // App Info
                         _buildAppInfo(screenWidth),
-                        
+
                         SizedBox(height: screenWidth * 0.05),
                       ],
                     ),
@@ -341,7 +347,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, String? actionText, double screenWidth) {
+  Widget _buildSectionHeader(
+    String title,
+    String? actionText,
+    double screenWidth,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -382,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildPropertyCard(double screenWidth) {
     final property = userProfile!.properties.first;
-    
+
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.05),
       decoration: BoxDecoration(
@@ -873,7 +883,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               final index = entry.key;
               final item = entry.value;
               final isLast = index == items.length - 1;
-              
+
               return Column(
                 children: [
                   ListTile(
@@ -926,42 +936,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildAppInfo(double screenWidth) {
-  return Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: "Crafted in Bengaluru, India with ",
-                style: GoogleFonts.lato(
-                  fontSize: screenWidth * 0.035,
-                  color: AppConstants.purple50,
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: "Crafted in Bengaluru, India with ",
+                  style: GoogleFonts.lato(
+                    fontSize: screenWidth * 0.035,
+                    color: AppConstants.purple50,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: "❤️",
-                style: GoogleFonts.lato(
-                  fontSize: screenWidth * 0.04,
+                TextSpan(
+                  text: "❤️",
+                  style: GoogleFonts.lato(fontSize: screenWidth * 0.04),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        SizedBox(height: screenWidth * 0.02),
-        Text(
-          "Version ${userProfile?.appVersion ?? '3.4.92'}",
-          style: GoogleFonts.lato(
-            fontSize: screenWidth * 0.035,
-            color: AppConstants.black50,
+          SizedBox(height: screenWidth * 0.02),
+          Text(
+            "Version ${userProfile?.appVersion ?? '3.4.92'}",
+            style: GoogleFonts.lato(
+              fontSize: screenWidth * 0.035,
+              color: AppConstants.black50,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   // Action methods
   void _editProfile() => print('Edit Profile');
@@ -980,7 +988,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _appPolicies() => print('App Policies');
   void _trainingFeedback() => print('Training Feedback');
   void _switchProfile() => print('Switch Profile');
-  void _logout() => print('Logout');
+  void _logout() async => await ref.read(authStateProvider.notifier).logout();
 }
 
 // Data Models
@@ -1019,11 +1027,7 @@ class QuickAction {
   final IconData icon;
   final VoidCallback onTap;
 
-  QuickAction({
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
+  QuickAction({required this.title, required this.icon, required this.onTap});
 }
 
 class MenuItem {

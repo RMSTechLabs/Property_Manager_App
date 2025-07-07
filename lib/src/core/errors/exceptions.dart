@@ -74,3 +74,10 @@ class NotificationException implements Exception {
   @override
   String toString() => 'NotificationException: $message';
 }
+
+class FCMException implements Exception {
+  final String message;
+  const FCMException(this.message);
+  @override
+  String toString() => 'FCMException: $message';
+}

@@ -10,8 +10,8 @@ class LogoutUseCase {
 
   LogoutUseCase(this.repository);
 
-  Future<Either<Failure, void>> call() {
-    return repository.logout();
+  Future<Either<Failure, void>> call(String email) {
+    return repository.logout(email);
   }
 }
 

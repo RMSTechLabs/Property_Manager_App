@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:property_manager_app/src/data/datasources/fcm_remote_datasource.dart';
 import 'package:property_manager_app/src/data/models/auth_response_model.dart';
 import 'package:property_manager_app/src/data/models/send_otp_response_model.dart';
 import '../../core/constants/api_constants.dart';
@@ -13,7 +14,7 @@ import '../models/user_model.dart';
 abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> login(String email, String password);
   Future<String> refreshToken(String refreshToken);
-  Future<void> logout();
+  Future<void> logout(String email);
   Future<UserModel> getCurrentUser();
   Future<SendOtpResponseModel> sendOtp(String email);
   Future<bool> validateOtp(String otp, String otpIdentifier);
@@ -21,9 +22,10 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
+  final FCMRemoteDataSource fcmDataSource; //
   var logger = Logger(printer: PrettyPrinter());
 
-  AuthRemoteDataSourceImpl(this.dio);
+  AuthRemoteDataSourceImpl(this.dio, this.fcmDataSource);
 
   @override
   Future<AuthResponseModel> login(String email, String password) async {
@@ -36,7 +38,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (response.data["success"] == false) {
           throw AuthException("Check Your Credentials");
         }
-        return AuthResponseModel.fromJson(response.data);
+
+        final authResponse = AuthResponseModel.fromJson(response.data);
+        logger.i('✅ Login successful for user: ${authResponse.user.id}');
+
+        // Register FCM token after successful login
+        try {
+          await _registerFCMToken(
+            authResponse.user.id,
+            authResponse.accessToken,
+          );
+          
+        } catch (fcmError) {
+          // Log FCM error but don't fail the login
+          logger.w('⚠️ FCM registration failed: $fcmError');
+        }
+        return authResponse;
       } else {
         // Don't throw generic error, let DioException handler below catch it
         throw ServerException(
@@ -71,6 +88,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         rethrow; // Re-throw our custom exceptions
       }
       throw ServerException('Unexpected error occurred');
+    }
+  }
+
+  Future<void> _registerFCMToken(String userId, String accessToken) async {
+    try {
+      logger.i('🔔 Registering FCM token for user: $userId');
+      await fcmDataSource.registerDevice(userId, accessToken);
+      logger.i('✅ FCM token registered successfully');
+    } catch (e) {
+      logger.e('❌ FCM token registration failed: $e');
+      // Don't throw - FCM registration failure shouldn't break login
     }
   }
 
@@ -162,11 +190,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> logout() async {
-    // Optional: Call logout endpoint if your backend requires it
-    // For now, just return as logout is handled locally
-    print('object');
-    return;
+  Future<void> logout(String email) async {
+    // First try to unregister FCM token
+    // Note: You might need to get userId from somewhere (maybe from stored user data)
+    // For now, we'll skip FCM unregistration during logout
+    // await fcmDataSource.unregisterDevice(userId, accessToken);
+    print(email);
+    try {
+      final response = await dio.post(
+        ApiConstants.logoutEndpoint,
+        data: {'username': email, 'platform': 'mobile', 'password': '1234'},
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw ServerException(
+          'Logout failed with status ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? 'Logout API call failed',
+      );
+    } catch (e) {
+      throw ServerException('Unexpected logout error');
+    }
   }
 
   @override
@@ -200,5 +247,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   final dio = ref.read(dioProvider);
-  return AuthRemoteDataSourceImpl(dio);
+  final fcmDataSource = ref.read(fcmRemoteDataSourceProvider);//
+  return AuthRemoteDataSourceImpl(dio, fcmDataSource);
 });

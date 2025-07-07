@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
+import 'package:property_manager_app/src/core/utils/app_helper.dart';
 import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 import 'package:property_manager_app/src/data/models/category_model.dart';
 import 'package:property_manager_app/src/data/models/location_model.dart';
@@ -842,10 +843,17 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
       source == ImageSource.camera ? Permission.camera : Permission.photos,
     )) {
       final XFile? image = await _picker.pickImage(source: source);
-      if (image != null) {
-        setState(() {
-          _selectedFiles.add(File(image.path));
-        });
+      final File? originalFile = image != null ? File(image.path) : null; //
+      if (originalFile != null) {
+        //
+        final File? compressedFile = await AppHelper.compressImage(
+          originalFile,
+        ); //
+        if (compressedFile != null) {
+          setState(() {
+            _selectedFiles.add(compressedFile);
+          });
+        }
       }
     }
   }

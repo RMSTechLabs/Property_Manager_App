@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:property_manager_app/src/presentation/providers/notification_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'src/app.dart';
 import 'src/core/utils/app_lifecycle_handler.dart';
 import 'src/core/utils/background_task_handler.dart';
@@ -21,32 +23,58 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 // final sharedPrefs = await SharedPreferences.getInstance();
 void main() async {
-  // Ensure Flutter is initialized
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    // Ensure Flutter is initialized
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print('🔥 Firebase initialized successfully');
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('🔥 Firebase initialized successfully');
 
-  // Set background message handler
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Set background message handler
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Initialize error handling
-  await _initializeErrorHandling();
+    // Initialize SharedPreferences
+    // final sharedPrefs = await SharedPreferences.getInstance();
+    // print('💾 SharedPreferences initialized');
 
-  // Load environment variables
-  await _loadEnvironment();
+    // Initialize error handling
+    await _initializeErrorHandling();
 
-  // Set system UI preferences
-  await _configureSystemUI();
+    // Load environment variables
+    await _loadEnvironment();
 
-  // Run the app with proper error boundary
-  runApp(
-    ProviderScope(
-      // overrides: [sharedPreferencesProvider.overrideWithValue(sharedPrefs)],
-      child: const PropertyManagerApp(),
-    ),
-  );
+    // Set system UI preferences
+    await _configureSystemUI();
+
+    // Run the app with proper error boundary
+    runApp(
+      ProviderScope(
+        // overrides: [sharedPreferencesProvider.overrideWithValue(sharedPrefs)],
+        child: const PropertyManagerApp(),
+      ),
+    );
+  } catch (e) {
+    print('❌ Initialization error: $e');
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                Text('Initialization Error: $e'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Initialize global error handling

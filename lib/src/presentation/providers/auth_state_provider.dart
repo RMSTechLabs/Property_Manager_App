@@ -354,6 +354,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:property_manager_app/src/data/models/send_otp_response_model.dart';
 import 'package:property_manager_app/src/domain/usecases/send_otp_usecase.dart';
 import 'package:property_manager_app/src/domain/usecases/validate_otp_usecase.dart';
+import 'package:property_manager_app/src/presentation/providers/fcm_provider..dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/jwt_decoder_util.dart';
@@ -442,7 +443,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   final RefreshTokenUseCase _refreshTokenUseCase;
   final SendOtpUseCase _sendOtpUseCase;
   final ValidateOtpUseCase _validateOtpUseCase;
-
+  final Ref _ref; // Add Ref to access other providers
   Timer? _refreshTimer;
   Timer? _periodicRefreshTimer;
 
@@ -452,6 +453,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     this._refreshTokenUseCase,
     this._sendOtpUseCase,
     this._validateOtpUseCase,
+    this._ref, //
   ) : super(const AuthState()) {
     _initializeAuth();
   }
@@ -490,6 +492,9 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
             );
             _scheduleTokenRefresh(accessToken);
             _schedulePeriodicRefresh();
+
+            // Register FCM token after successful token refresh
+            _registerFCMTokenIfNeeded(); //
           },
         );
       } else {
@@ -554,6 +559,9 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
         // Automatically send OTP after successful login
         await sendOtp();
+
+        // Register FCM token after successful login
+        await _registerFCMToken(user.id, token); //
       },
     );
   }
@@ -576,7 +584,6 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     );
 
     final result = await _sendOtpUseCase(emailToUse);
-    print('🙄$result');
     await result.fold(
       (failure) async {
         state = state.copyWith(
@@ -586,7 +593,6 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         );
       },
       (data) async {
-        print(data.toJson());
         final SendOtpResponseModel model = data;
         state = state.copyWith(
           step: AuthStep.otpSent,
@@ -658,13 +664,57 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _performLogout() async {
+    final email = state.user?.email ?? state.email;
+    if (email == null) {
+      state = state.copyWith(
+        step: AuthStep.error,
+        error: 'Cannot logout: Email not available',
+      );
+      return;
+    }
+
     _refreshTimer?.cancel();
     _periodicRefreshTimer?.cancel();
 
-    await _logoutUseCase();
+    // Unregister FCM token before logout
+    if (state.user != null && state.accessToken != null) {
+      await _unregisterFCMToken(state.user!.id, state.accessToken!);
+    }
+
+    await _logoutUseCase(email);
     await SecureStorage.deleteAll();
 
     state = const AuthState(step: AuthStep.initial, isInitialized: true);
+  }
+
+  Future<void> _registerFCMToken(String userId, String accessToken) async {
+    try {
+      print('🔔 Registering FCM token for user: $userId');
+      await _ref.read(fcmProvider.notifier).registerDevice(userId, accessToken);
+      print('✅ FCM token registration completed');
+    } catch (e) {
+      print('⚠️ FCM token registration failed: $e');
+      // Don't fail auth for FCM registration failure
+    }
+  }
+
+  Future<void> _registerFCMTokenIfNeeded() async {
+    if (state.user != null && state.accessToken != null) {
+      await _registerFCMToken(state.user!.id, state.accessToken!);
+    }
+  }
+
+  Future<void> _unregisterFCMToken(String userId, String accessToken) async {
+    try {
+      print('🗑️ Unregistering FCM token for user: $userId');
+      await _ref
+          .read(fcmProvider.notifier)
+          .unregisterDevice(userId, accessToken);
+      print('✅ FCM token unregistration completed');
+    } catch (e) {
+      print('⚠️ FCM token unregistration failed: $e');
+      // Don't fail logout for FCM unregistration failure
+    }
   }
 
   void _scheduleTokenRefresh(String token) {
@@ -684,6 +734,15 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       print('Error scheduling token refresh: $e');
       _schedulePeriodicRefresh();
+    }
+  }
+
+   Future<void> _updateFCMTokenIfNeeded(String userId, String accessToken) async {
+    try {
+      await _ref.read(fcmProvider.notifier).updateToken(userId, accessToken);
+    } catch (e) {
+      print('⚠️ FCM token update failed: $e');
+      // Don't fail token refresh for FCM update failure
     }
   }
 
@@ -714,6 +773,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       (accessToken) async {
         state = state.copyWith(accessToken: accessToken);
         _scheduleTokenRefresh(accessToken);
+
+        // Update FCM token if needed
+        if (state.user != null) {
+          _updateFCMTokenIfNeeded(state.user!.id, accessToken);
+        }
       },
     );
   }
@@ -735,6 +799,7 @@ final authStateProvider = StateNotifierProvider<AuthStateNotifier, AuthState>((
     ref.read(refreshTokenUseCaseProvider),
     ref.read(sendOtpUseCaseProvider),
     ref.read(validateOtpUseCaseProvider),
+    ref,
   );
 });
 

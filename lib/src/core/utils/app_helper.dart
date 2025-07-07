@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class AppHelper {
   /// Converts a sentence to sentence case (each word's first letter capitalized)
@@ -84,5 +87,22 @@ class AppHelper {
   static Future<bool> isAndroid11OrAbove() async {
     final androidInfo = await DeviceInfoPlugin().androidInfo;
     return androidInfo.version.sdkInt >= 30;
+  }
+
+  static Future<File?> compressImage(File file) async {
+    final targetPath =
+        '${file.parent.path}/${DateTime.now().millisecondsSinceEpoch}_compressed.jpg';
+
+    final XFile? compressedXFile =
+        await FlutterImageCompress.compressAndGetFile(
+          file.path,
+          targetPath,
+          quality: 75,
+          minWidth: 1024,
+          minHeight: 1024,
+        );
+
+    // Convert XFile to File
+    return compressedXFile != null ? File(compressedXFile.path) : null;
   }
 }
