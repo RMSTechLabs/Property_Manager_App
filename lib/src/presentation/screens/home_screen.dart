@@ -38,6 +38,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
+    // Initialize the focus node for community selection
+    _communityFocusNode = FocusNode();
+    _communityFocusNode.addListener(() {
+      if (_communityFocusNode.hasFocus &&
+          _communityController.text.trim().isEmpty) {
+        setState(() {}); // force dropdown to open if needed
+      }
+    });
   }
 
   Future<void> _loadData() async {
@@ -93,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return CommunityItem(
         id: society.id ?? 'unknown',
         name:
-            '${society.block ?? ''}-${society.flat ?? ''}-${society.societyId ?? ''}-${society.areaId ?? ''}-${society.apartmentId ?? ''},${society.block},${society.society}'
+            '${society.block ?? ''}-${society.apartmentId ?? ''},${society.block},${society.society}'
                 .trim(),
         residentType: society.residentType ?? 'Unknown',
         ownerOrTenantName: ownerOrTenantName,
@@ -245,7 +253,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: TypeAheadField<CommunityItem>(
         controller: _communityController,
         debounceDuration: const Duration(milliseconds: 300), //
-
+        focusNode:
+            _communityFocusNode, // use your manually controlled focusNode
         builder: (context, controller, focusNode) {
           return TextField(
             controller: controller,
@@ -271,14 +280,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 horizontal: 16,
                 vertical: 8,
               ),
+              // suffixIcon: GestureDetector(
+              // onTap: () {
+              //   if (_communityFocusNode.hasFocus) {
+              //     _communityFocusNode.unfocus(); // Hide dropdown
+              //   } else {
+              //     _communityFocusNode.requestFocus(); // Show dropdown
+              //   }
+              // },
+              //   child: const Icon(
+              //     Icons.keyboard_arrow_down,
+              //     color: Colors.black,
+              //   ),
+              // ),
               suffixIcon: GestureDetector(
-                // onTap: () {
-                //   if (_communityFocusNode.hasFocus) {
-                //     _communityFocusNode.unfocus(); // Hide dropdown
-                //   } else {
-                //     _communityFocusNode.requestFocus(); // Show dropdown
-                //   }
-                // },
+                onTap: () {
+                  // Temporarily clear controller text to force show all suggestions
+                  final previousText = _communityController.text;
+
+                  _communityController.clear();
+                  _communityFocusNode.requestFocus();
+
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    _communityController.text = previousText;
+                    _communityController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: previousText.length),
+                    );
+                  });
+                },
                 child: const Icon(
                   Icons.keyboard_arrow_down,
                   color: Colors.black,
@@ -301,6 +330,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
         suggestionsCallback: (pattern) {
+          if (pattern.trim().isEmpty) {
+            return communities;
+          }
           return communities
               .where(
                 (community) => community.name.toLowerCase().contains(

@@ -48,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _startOtpTimer() {
-    _otpTimeLeft = 10; // 2 minutes
+    _otpTimeLeft = 300; // 5 minutes
     _otpTimer?.cancel();
     _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
@@ -74,10 +74,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-
     await ref
         .read(authStateProvider.notifier)
-        .login(_emailController.text.trim(), _passwordController.text);
+        .login(_emailController.text.trim(), "1234");
   }
 
   Future<void> _handleOtpVerification() async {
@@ -157,68 +156,68 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: 20),
 
         // Password Field
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Password",
-              style: TextStyle(
-                fontSize: 14,
-                color: AppConstants.black50,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _handleLogin(),
-              decoration: InputDecoration(
-                hintText: "Enter your password",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppConstants.white50),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppConstants.white50),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppConstants.purple50,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: AppConstants.gray,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
+        // Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     const Text(
+        //       "Password",
+        //       style: TextStyle(
+        //         fontSize: 14,
+        //         color: AppConstants.black50,
+        //         fontWeight: FontWeight.w500,
+        //       ),
+        //     ),
+        //     const SizedBox(height: 8),
+        //     TextFormField(
+        //       controller: _passwordController,
+        //       obscureText: _obscurePassword,
+        //       textInputAction: TextInputAction.done,
+        //       onFieldSubmitted: (_) => _handleLogin(),
+        //       decoration: InputDecoration(
+        //         hintText: "Enter your password",
+        //         border: OutlineInputBorder(
+        //           borderRadius: BorderRadius.circular(12),
+        //           borderSide: const BorderSide(color: AppConstants.white50),
+        //         ),
+        //         enabledBorder: OutlineInputBorder(
+        //           borderRadius: BorderRadius.circular(12),
+        //           borderSide: const BorderSide(color: AppConstants.white50),
+        //         ),
+        //         focusedBorder: OutlineInputBorder(
+        //           borderRadius: BorderRadius.circular(12),
+        //           borderSide: const BorderSide(
+        //             color: AppConstants.purple50,
+        //             width: 2,
+        //           ),
+        //         ),
+        //         contentPadding: const EdgeInsets.symmetric(
+        //           horizontal: 16,
+        //           vertical: 16,
+        //         ),
+        //         suffixIcon: IconButton(
+        //           icon: Icon(
+        //             _obscurePassword ? Icons.visibility_off : Icons.visibility,
+        //             color: AppConstants.gray,
+        //           ),
+        //           onPressed: () {
+        //             setState(() {
+        //               _obscurePassword = !_obscurePassword;
+        //             });
+        //           },
+        //         ),
+        //       ),
+        //       validator: (value) {
+        //         if (value == null || value.isEmpty) {
+        //           return 'Please enter your password';
+        //         }
+        //         if (value.length <4) {
+        //           return 'Password must be at least 4 characters';
+        //         }
+        //         return null;
+        //       },
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
