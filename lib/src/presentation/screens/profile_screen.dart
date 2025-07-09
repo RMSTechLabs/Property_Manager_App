@@ -44,6 +44,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             status: "Residing as Tenant",
             passcode: "861458",
           ),
+          PropertyDetails(
+            id: "Community-C01",
+            name: "BNH Tower 03",
+            status: "Residing as Tenant",
+            passcode: "861458",
+          ),
+          PropertyDetails(
+            id: "Community-C01",
+            name: "BNH Tower 03",
+            status: "Residing as Tenant",
+            passcode: "861458",
+          ),
         ],
         appVersion: "3.4.92",
       );

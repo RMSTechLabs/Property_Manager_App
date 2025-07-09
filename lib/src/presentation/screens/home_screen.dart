@@ -9,6 +9,7 @@ import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/data/models/community_item_model.dart';
 import 'package:property_manager_app/src/data/models/society_state_model.dart';
 import 'package:property_manager_app/src/presentation/providers/society_provider.dart';
+import 'package:property_manager_app/src/presentation/widgets/common_alert_dialog.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/core/utils/app_helper.dart';
 
@@ -38,8 +39,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
+
     // Initialize the focus node for community selection
-    _communityFocusNode = FocusNode();
     _communityFocusNode.addListener(() {
       if (_communityFocusNode.hasFocus &&
           _communityController.text.trim().isEmpty) {
@@ -65,15 +66,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             societyListState.societies,
             societyListState.ownerOrTenantName!,
           );
-          if (communities.isNotEmpty) {
-            selectedCommunity = communities.first;
+          // if (communities.isNotEmpty) {
+          //   selectedCommunity = communities.first;
 
-            _communityController.text = selectedCommunity!.name.split(',')[0];
-            // 🔥 SET INITIAL COMMUNITY GLOBALLY
-            ref.read(selectedCommunityProvider.notifier).state =
-                selectedCommunity;
-            logger.i('Initial community set: ${selectedCommunity!.id}');
-          }
+          //   _communityController.text = selectedCommunity!.name.split(',')[0];
+          //   // 🔥 SET INITIAL COMMUNITY GLOBALLY
+          //   ref.read(selectedCommunityProvider.notifier).state =
+          //       selectedCommunity;
+          //   logger.i('Initial community set: ${selectedCommunity!.id}');
+          // }
           _isLoading = false;
           _isError = false;
         });
@@ -154,7 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       //   width: screenWidth * 0.12,
                       //   height: screenWidth * 0.12,
                       //   decoration: BoxDecoration(
-                      //     color: Colors.white.withOpacity(0.2),
+                      //     color: Colors.white.withValues(alpha:0.2),
                       //     borderRadius: BorderRadius.circular(
                       //       screenWidth * 0.06,
                       //     ),
@@ -169,7 +170,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         width: screenWidth * 0.12,
                         height: screenWidth * 0.12,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(
                             screenWidth * 0.06,
                           ),
@@ -219,17 +220,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
 
                         // Amenities Section
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            screenWidth * 0.05,
-                            0,
-                            screenWidth * 0.05,
-                            screenWidth * 0.05,
-                          ),
-                          child: _isLoading
-                              ? _buildSkeletonAmenities(screenWidth)
-                              : _buildAmenitiesCard(screenWidth),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.fromLTRB(
+                        //     screenWidth * 0.05,
+                        //     0,
+                        //     screenWidth * 0.05,
+                        //     screenWidth * 0.05,
+                        //   ),
+                        //   child: _isLoading
+                        //       ? _buildSkeletonAmenities(screenWidth)
+                        //       : _buildAmenitiesCard(screenWidth),
+                        // ),
                       ],
                     ),
                   ),
@@ -244,17 +245,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCommunityTypeAhead() {
     return Container(
-      // constraints: const BoxConstraints(minHeight:10),
+      constraints: const BoxConstraints(minHeight: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.52),
+        // color: Colors.white.withValues(alpha: 0.52),
+        color: Colors.black12.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.52)),
+        // border: Border.all(color: Colors.white.withValues(alpha: 0.52)),
       ),
       child: TypeAheadField<CommunityItem>(
         controller: _communityController,
-        debounceDuration: const Duration(milliseconds: 300), //
+        debounceDuration: const Duration(milliseconds: 300),
         focusNode:
-            _communityFocusNode, // use your manually controlled focusNode
+            _communityFocusNode, // Use the focus node to control dropdown visibility
         builder: (context, controller, focusNode) {
           return TextField(
             controller: controller,
@@ -270,7 +272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               hint: Text(
                 "Select Community",
                 style: GoogleFonts.lato(
-                  color: AppConstants.black50,
+                  color: AppConstants.white50,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -280,37 +282,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 horizontal: 16,
                 vertical: 8,
               ),
-              // suffixIcon: GestureDetector(
-              // onTap: () {
-              //   if (_communityFocusNode.hasFocus) {
-              //     _communityFocusNode.unfocus(); // Hide dropdown
-              //   } else {
-              //     _communityFocusNode.requestFocus(); // Show dropdown
-              //   }
-              // },
-              //   child: const Icon(
-              //     Icons.keyboard_arrow_down,
-              //     color: Colors.black,
-              //   ),
-              // ),
               suffixIcon: GestureDetector(
                 onTap: () {
-                  // Temporarily clear controller text to force show all suggestions
-                  final previousText = _communityController.text;
-
-                  _communityController.clear();
-                  _communityFocusNode.requestFocus();
-
-                  Future.delayed(Duration(milliseconds: 100), () {
-                    _communityController.text = previousText;
-                    _communityController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: previousText.length),
-                    );
-                  });
+                  if (_communityFocusNode.hasFocus) {
+                    _communityFocusNode.unfocus(); // Hide dropdown
+                  } else {
+                    _communityFocusNode.requestFocus(); // Show dropdown
+                  }
+                  setState(() {}); // Trigger rebuild to update icon
                 },
-                child: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.black,
+                child: Icon(
+                  _communityFocusNode.hasFocus
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: AppConstants.white50,
                 ),
               ),
 
@@ -320,17 +305,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                // borderSide: BorderSide(
+                // color: Colors.white.withValues(alpha: 0.2),
+                // ),
+                borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.white),
+                // borderSide: const BorderSide(color: Colors.white),
+                borderSide: BorderSide.none,
               ),
             ),
           );
         },
         suggestionsCallback: (pattern) {
-          if (pattern.trim().isEmpty) {
+          logger.i('Searching communities with pattern: $pattern');
+          if (pattern.isEmpty) {
             return communities;
           }
           return communities
@@ -412,7 +402,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFF2F4F5),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: child,
             ),
@@ -424,25 +414,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSkeletonTypeAhead() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      constraints: const BoxConstraints(minHeight: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        // border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 20,
+              height: 15,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
             ).redacted(context: context, redact: true),
           ),
           const SizedBox(width: 8),
-          Icon(Icons.keyboard_arrow_down, color: Colors.white.withOpacity(0.5)),
+          Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.white.withValues(alpha: 0.5),
+          ),
         ],
       ),
     );
@@ -460,20 +454,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisSpacing: screenWidth * 0.04,
           childAspectRatio: childAspectRatio,
           children: [
-            _buildDashboardCard(
-              icon: Icons.people_outline,
-              title: "Visitors",
-              subtitle: "Expected & past visitors",
-              onTap: () => _navigateToVisitors(),
-              screenWidth: screenWidth,
-            ),
-            _buildDashboardCard(
-              icon: Icons.notifications_outlined,
-              title: "Notify Gate",
-              subtitle: "Expected cab, delivery etc",
-              onTap: () => _navigateToNotifyGate(),
-              screenWidth: screenWidth,
-            ),
+            // _buildDashboardCard(
+            //   icon: Icons.people_outline,
+            //   title: "Visitors",
+            //   subtitle: "Expected & past visitors",
+            //   onTap: () => _navigateToVisitors(),
+            //   screenWidth: screenWidth,
+            // ),
+            // _buildDashboardCard(
+            //   icon: Icons.notifications_outlined,
+            //   title: "Notify Gate",
+            //   subtitle: "Expected cab, delivery etc",
+            //   onTap: () => _navigateToNotifyGate(),
+            //   screenWidth: screenWidth,
+            // ),
             _buildDashboardCard(
               icon: Icons.help_outline,
               title: "Help Desk",
@@ -520,12 +514,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: Padding(
         padding: EdgeInsets.all(screenWidth * 0.05),
@@ -579,12 +573,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
         ),
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.04),
@@ -651,12 +645,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
@@ -723,12 +717,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -788,11 +782,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     print('Navigate to Notify Gate');
   }
 
+  void _showSelectCommunityAlert() {
+    CommonAlertDialogHelper.showWarning(
+      context: context,
+      title: 'Community Required',
+      content: 'Please select a community before continuing.',
+      buttonText: 'OK',
+    );
+  }
+
   void _navigateToHelpDesk() {
+    if (selectedCommunity == null) {
+      _showSelectCommunityAlert();
+      return;
+    }
+
     context.push('/help_desk');
   }
 
   void _navigateToNoticeBoard() {
+    if (selectedCommunity == null) {
+      _showSelectCommunityAlert();
+      return;
+    }
     context.push('/notice_board');
   }
 
