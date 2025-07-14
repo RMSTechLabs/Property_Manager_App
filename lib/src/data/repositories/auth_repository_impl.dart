@@ -2,6 +2,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:property_manager_app/src/data/models/send_otp_response_model.dart';
+import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
 
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
@@ -52,9 +53,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> validateOtp(String otp,String otpIdentifier) async {
+  Future<Either<Failure, bool>> validateOtp(
+    String otp,
+    String otpIdentifier,
+  ) async {
     try {
-      final validateResponse = await remoteDataSource.validateOtp(otp,otpIdentifier);
+      final validateResponse = await remoteDataSource.validateOtp(
+        otp,
+        otpIdentifier,
+      );
       return Right(validateResponse);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
@@ -88,6 +95,24 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure('Logout failed'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserProfileDataModel>> getUserProfile(
+    String userId,
+  ) async {
+    try {
+      final profileResponse = await remoteDataSource.getUserProfile(userId);
+      return Right(profileResponse.data);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('Unexpected error: ${e.toString()}'));
     }
   }
 

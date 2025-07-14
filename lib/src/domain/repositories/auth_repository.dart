@@ -1,6 +1,7 @@
 // lib/src/domain/repositories/auth_repository.dart
 import 'package:dartz/dartz.dart';
 import 'package:property_manager_app/src/data/models/send_otp_response_model.dart';
+import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
 import '../../core/errors/failures.dart';
 import '../entities/user.dart';
 
@@ -14,4 +15,5 @@ abstract class AuthRepository {
   Future<Either<Failure, User>> getCurrentUser();
   Future<Either<Failure, SendOtpResponseModel>> sendOtp(String email);
   Future<Either<Failure, bool>> validateOtp(String otp, String otpIdentifier);
+  Future<Either<Failure, UserProfileDataModel>> getUserProfile(String userId);
 }

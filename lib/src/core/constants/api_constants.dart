@@ -35,6 +35,9 @@ class ApiConstants {
   static const String updateDeviceTokenEndpoint = '/devices/update-token';
   static const String unregisterDeviceEndpoint = '/devices/unregister';
 
+  // New endpoint for user profile with properties
+  static String getUserProfileEndpoint(String userId) => '/auth/me/$userId';
+
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));
   static Duration get receiveTimeout =>

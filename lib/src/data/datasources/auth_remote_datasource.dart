@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:property_manager_app/src/data/datasources/fcm_remote_datasource.dart';
 import 'package:property_manager_app/src/data/models/auth_response_model.dart';
 import 'package:property_manager_app/src/data/models/send_otp_response_model.dart';
+import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/errors/exceptions.dart';
 import '../../presentation/providers/dio_provider.dart';
@@ -18,6 +19,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> getCurrentUser();
   Future<SendOtpResponseModel> sendOtp(String email);
   Future<bool> validateOtp(String otp, String otpIdentifier);
+  Future<UserProfileResponseModel> getUserProfile(String userId);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -48,7 +50,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             authResponse.user.id,
             authResponse.accessToken,
           );
-          
         } catch (fcmError) {
           // Log FCM error but don't fail the login
           logger.w('⚠️ FCM registration failed: $fcmError');
@@ -101,6 +102,51 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Don't throw - FCM registration failure shouldn't break login
     }
   }
+
+
+@override
+Future<UserProfileResponseModel> getUserProfile(String userId) async {
+  try {
+    final response = await dio.get(
+      ApiConstants.getUserProfileEndpoint(userId),
+      queryParameters: {'userId': userId},
+    );
+
+    if (response.statusCode == 200) {
+      final profileResponse = UserProfileResponseModel.fromJson(response.data);
+      
+      if (!profileResponse.success) {
+        throw ServerException(profileResponse.message);
+      }
+      
+      logger.i('✅ User profile fetched successfully for user: $userId');
+      return profileResponse;
+    } else {
+      throw ServerException(
+        'Failed to get user profile with status: ${response.statusCode}',
+      );
+    }
+  } on DioException catch (e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      throw NetworkException('Connection timeout');
+    } else if (e.response?.statusCode == 401) {
+      throw AuthException('Unauthorized access');
+    } else if (e.response?.statusCode == 404) {
+      throw ServerException('User profile not found');
+    } else {
+      final message = e.response?.data?['message'] ?? 
+                     e.response?.data?['error'] ?? 
+                     'Failed to get user profile';
+      throw ServerException(message);
+    }
+  } catch (e) {
+    if (e is NetworkException || e is ServerException || e is AuthException) {
+      rethrow;
+    }
+    throw ServerException('Unexpected error occurred while fetching profile');
+  }
+}
 
   @override
   Future<SendOtpResponseModel> sendOtp(String email) async {
@@ -247,6 +293,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   final dio = ref.read(dioProvider);
-  final fcmDataSource = ref.read(fcmRemoteDataSourceProvider);//
+  final fcmDataSource = ref.read(fcmRemoteDataSourceProvider); //
   return AuthRemoteDataSourceImpl(dio, fcmDataSource);
 });

@@ -564,16 +564,16 @@
 // }
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/localization/app_localizations.dart';
+import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
 import 'package:property_manager_app/src/presentation/widgets/gradient_button.dart';
-import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -673,7 +673,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               "Email Address",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black87, // Darker color for better contrast
+                color: Color(0xFF2D3748), // Dark slate gray
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -683,25 +683,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               style: const TextStyle(
-                color: Colors.black87, // Dark text for good contrast
+                color: Color(0xFF2D3748), // Dark slate gray
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: "Enter your email",
-                hintStyle: TextStyle(
-                  color: Colors.black54, // Subtle hint text
+                hintStyle: const TextStyle(
+                  color: Color(0xFF718096), // Muted gray
                   fontSize: 16,
                 ),
                 filled: true,
-                fillColor: Colors.black12, // Transparent background
+                fillColor: Colors.white.withOpacity(0.9), // More opaque white background
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -710,9 +710,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     width: 2,
                   ),
                 ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
+                ),
+                prefixIcon: const Icon(
+                  Icons.email_outlined,
+                  color: Color(0xFF718096),
+                  size: 20,
                 ),
               ),
               validator: (value) {
@@ -731,7 +744,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: 20),
 
-        // Password Field
+        // Password Field (kept commented as per requirement)
         // Column(
         //   crossAxisAlignment: CrossAxisAlignment.start,
         //   children: [
@@ -810,7 +823,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               "Email Address",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black87, // Darker color for better contrast
+                color: Color(0xFF2D3748), // Dark slate gray
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -818,23 +831,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.black12, // Transparent background to match
+                color: Colors.white.withOpacity(0.7), // Semi-transparent white
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black26),
+                border: Border.all(color: Colors.white.withOpacity(0.5)),
               ),
               child: Row(
                 children: [
+                  const Icon(
+                    Icons.email_outlined,
+                    color: Color(0xFF718096),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _emailController.text,
                       style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.black87, // Dark text for consistency
+                        color: Color(0xFF2D3748), // Dark slate gray
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  const Icon(Icons.lock, size: 18, color: Colors.black54),
+                  const Icon(Icons.lock, size: 18, color: Color(0xFF718096)),
                 ],
               ),
             ),
@@ -850,7 +869,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               "Verification Code",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black87, // Darker color for better contrast
+                color: Color(0xFF2D3748), // Dark slate gray
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -863,27 +882,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (_) => _handleOtpVerification(),
               style: const TextStyle(
-                color: Colors.black87, // Dark text for good contrast
-                fontSize: 16,
+                color: Color(0xFF2D3748), // Dark slate gray
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                letterSpacing: 2.0, // Better spacing for OTP
+                letterSpacing: 3.0, // Better spacing for OTP
               ),
               decoration: InputDecoration(
-                hintText: "Enter 6-digit OTP",
-                hintStyle: TextStyle(
-                  color: Colors.black54, // Subtle hint text
-                  fontSize: 16,
-                  letterSpacing: 1.0,
+                hintText: "• • • • • •",
+                hintStyle: const TextStyle(
+                  color: Color(0xFF718096), // Muted gray
+                  fontSize: 18,
+                  letterSpacing: 3.0,
                 ),
                 filled: true,
-                fillColor: Colors.black12, // Transparent background
+                fillColor: Colors.white.withOpacity(0.9), // More opaque white background
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -897,6 +916,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   vertical: 16,
                 ),
                 counterText: '',
+                prefixIcon: const Icon(
+                  Icons.security,
+                  color: Color(0xFF718096),
+                  size: 20,
+                ),
                 suffixIcon: _otpTimeLeft > 0
                     ? Padding(
                         padding: const EdgeInsets.all(12),
@@ -904,7 +928,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            value: _otpTimeLeft / 120,
+                            value: _otpTimeLeft / 300,
                             strokeWidth: 2,
                             backgroundColor: Colors.grey.shade300,
                             valueColor: const AlwaysStoppedAnimation<Color>(
@@ -927,13 +951,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (_otpTimeLeft > 0)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Code expires in ${_otpTimeLeft ~/ 60}:${(_otpTimeLeft % 60).toString().padLeft(2, '0')}',
-              style: TextStyle(
-                color: Colors.orange.shade700,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.timer,
+                  size: 16,
+                  color: Colors.orange.shade700,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Code expires in ${_otpTimeLeft ~/ 60}:${(_otpTimeLeft % 60).toString().padLeft(2, '0')}',
+                  style: TextStyle(
+                    color: Colors.orange.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -942,13 +976,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Center(
-              child: TextButton(
-                onPressed: _handleResendOtp,
-                child: const Text(
-                  'Resend OTP',
-                  style: TextStyle(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white.withOpacity(0.1),
+                ),
+                child: TextButton.icon(
+                  onPressed: _handleResendOtp,
+                  icon: const Icon(
+                    Icons.refresh,
+                    size: 16,
                     color: AppConstants.purple50,
-                    fontWeight: FontWeight.w600,
+                  ),
+                  label: const Text(
+                    'Resend OTP',
+                    style: TextStyle(
+                      color: AppConstants.purple50,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -1008,41 +1053,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         width: double.infinity,
         child: Stack(
           children: [
-            // Full-screen background image overlay with transparency
+            // Background with gradient + image overlay
             Positioned.fill(
               child: Container(
                 width: double.infinity,
                 height: double.infinity,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: const AssetImage('assets/images/overlay.jpg'), // Replace with your image path
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    // Error handling through onError callback
-                    onError: (exception, stackTrace) {
-                      // Handle image loading errors
-                      debugPrint('Image loading error: $exception');
-                    },
-                    // Add transparency to the image
-                    colorFilter: ColorFilter.mode(
-                      Colors.white.withValues(alpha:0.85), // Adjust opacity (0.0 = fully transparent, 1.0 = fully opaque)
-                      BlendMode.modulate,
-                    ),
-                  ),
-                  // Fallback gradient in case image fails
+                  // Primary gradient background
                   gradient: AppConstants.secondartGradient,
                 ),
-                // Additional transparency layer for better control
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha:0.2),
-                        Colors.black.withValues(alpha:0.05),
-                        Colors.transparent,
-                      ],
+                    // Image overlay with reduced opacity
+                    image: DecorationImage(
+                      image: const AssetImage('assets/images/overlay.jpg'),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      // Image overlay with transparency
+                      colorFilter: ColorFilter.mode(
+                        Colors.white.withValues(alpha: 0.15), // Very low opacity for subtle overlay
+                        BlendMode.modulate,
+                      ),
+                      onError: (exception, stackTrace) {
+                        debugPrint('Image loading error: $exception');
+                      },
+                    ),
+                  ),
+                  // Additional gradient overlay for depth
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.1),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.05),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1077,9 +1125,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 color: Colors.white,
                                 shadows: [
                                   Shadow(
-                                    offset: Offset(1, 1),
-                                    blurRadius: 3,
-                                    color: Colors.black26,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 6,
+                                    color: Colors.black38,
                                   ),
                                 ],
                               ),
@@ -1087,7 +1135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 30, right: 5),
+                          padding: const EdgeInsets.only(left: 30, right: 20),
                           child: Text(
                             "Dubai's premier property management platform. Streamline operations, enhance security, and build stronger communities.",
                             style: GoogleFonts.lato(
@@ -1095,13 +1143,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   .copyWith(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
-                                    color: Colors.white70,
+                                    color: Colors.white.withOpacity(0.9),
                                     letterSpacing: 0.1,
                                     height: 1.1,
                                     shadows: const [
                                       Shadow(
                                         offset: Offset(1, 1),
-                                        blurRadius: 2,
+                                        blurRadius: 3,
                                         color: Colors.black26,
                                       ),
                                     ],
@@ -1113,91 +1161,125 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
 
-                  // Bottom form container
+                  // Bottom form container with glassmorphism effect
                   Positioned(
                     bottom: 0,
                     left: 13,
                     right: 13,
                     child: Container(
                       height: formHeight,
-                      decoration: const BoxDecoration(
-                        color:Colors.black12, // Use a subtle background color
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        // Glassmorphism effect
+                        color: Colors.white.withOpacity(0.25),
+                        borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30),
                         ),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 20,
-                            offset: Offset(0, -5),
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 25,
+                            offset: const Offset(0, -8),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, -2),
                           ),
                         ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: SingleChildScrollView(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(height: 16),
-                                Text(
-                                  showOtpForm ? 'Verify OTP' : "Welcome Back",
-                                  style: GoogleFonts.lato(
-                                    textStyle: const TextStyle(
-                                      fontSize: 28,
-                                      letterSpacing: 0.07,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppConstants.black,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0.1),
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: SingleChildScrollView(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    showOtpForm ? 'Verify OTP' : "Welcome Back",
+                                    style: GoogleFonts.lato(
+                                      textStyle: const TextStyle(
+                                        fontSize: 28,
+                                        letterSpacing: 0.07,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1A202C), // Very dark gray
+                                        shadows: [
+                                          Shadow(
+                                            offset: Offset(1, 1),
+                                            blurRadius: 2,
+                                            color: Colors.white54,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  showOtpForm
-                                      ? "Please enter the OTP sent to ${_emailController.text}"
-                                      : "Enter your details below",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black87, // Better contrast
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    showOtpForm
+                                        ? "Please enter the OTP sent to ${_emailController.text}"
+                                        : "Enter your details below",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFF4A5568), // Medium gray
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 32),
+                                  const SizedBox(height: 32),
 
-                                // Dynamic form content
-                                if (showOtpForm)
-                                  _buildOtpForm()
-                                else
-                                  _buildLoginForm(l10n),
+                                  // Dynamic form content
+                                  if (showOtpForm)
+                                    _buildOtpForm()
+                                  else
+                                    _buildLoginForm(l10n),
 
-                                const SizedBox(height: 32),
+                                  const SizedBox(height: 32),
 
-                                // Submit button
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 56,
-                                  child: GradientButton(
-                                    onPressed: authState.isLoading
-                                        ? null
-                                        : (showOtpForm
-                                              ? _handleOtpVerification
-                                              : _handleLogin),
-                                    label: showOtpForm
-                                        ? (authState.step == AuthStep.verifyingOtp
-                                              ? 'Verifying...'
-                                              : 'Verify OTP')
-                                        : (authState.step == AuthStep.authenticating
-                                              ? 'Signing In...'
-                                              : 'Sign In'),
-                                    isLoading: authState.isLoading,
+                                  // Submit button
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 56,
+                                    child: GradientButton(
+                                      onPressed: authState.isLoading
+                                          ? null
+                                          : (showOtpForm
+                                                ? _handleOtpVerification
+                                                : _handleLogin),
+                                      label: showOtpForm
+                                          ? (authState.step == AuthStep.verifyingOtp
+                                                ? 'Verifying...'
+                                                : 'Verify OTP')
+                                          : (authState.step == AuthStep.authenticating
+                                                ? 'Signing In...'
+                                                : 'Sign In'),
+                                      isLoading: authState.isLoading,
+                                    ),
                                   ),
-                                ),
 
-                                const SizedBox(height: 24),
-                              ],
+                                  const SizedBox(height: 24),
+                                ],
+                              ),
                             ),
                           ),
                         ),
