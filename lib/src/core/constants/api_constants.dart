@@ -37,7 +37,8 @@ class ApiConstants {
 
   // New endpoint for user profile with properties
   static String getUserProfileEndpoint(String userId) => '/auth/me/$userId';
-
+  static String getUserProfileUpdateWithImageEndpoint(String memberId) =>
+      '/member/edit-member-with-profile/$memberId';
   static Duration get connectTimeout =>
       Duration(milliseconds: int.parse(dotenv.env['API_TIMEOUT'] ?? '30000'));
   static Duration get receiveTimeout =>

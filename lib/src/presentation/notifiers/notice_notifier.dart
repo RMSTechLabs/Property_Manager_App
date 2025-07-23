@@ -138,7 +138,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
   /// Call this to identify which notices are bookmarked
   Future<List<String>> getSavedNoticeIds() async {
     final dio = ref.read(dioProvider);
-    final selectedCommunity = ref.read(selectedCommunityProvider);
+    final selectedCommunity = ref.watch(selectedCommunityProvider);
     
     if (selectedCommunity == null) return [];
     

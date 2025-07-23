@@ -1,6 +1,5 @@
 // lib/src/data/models/user_profile_response_model.dart
 
-
 class UserProfileResponseModel {
   final bool success;
   final String message;
@@ -30,7 +29,13 @@ class UserProfileResponseModel {
 class UserProfileDataModel {
   final String name;
   final String phone;
+  final String? bio;
+  final String email;
+  final String? location;
+  final String? occupation;
+  final String? interests;
   final String? avatar;
+  final int? age;
   final List<PropertyDetailsModel> properties;
   final String appVersion;
 
@@ -40,6 +45,12 @@ class UserProfileDataModel {
     this.avatar,
     required this.properties,
     required this.appVersion,
+    this.bio,
+    required this.email,
+    this.location,
+    this.occupation,
+    this.interests,
+    this.age,
   });
 
   factory UserProfileDataModel.fromJson(Map<String, dynamic> json) {
@@ -47,10 +58,20 @@ class UserProfileDataModel {
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       avatar: json['avatar'],
-      properties: (json['properties'] as List<dynamic>?)
-          ?.map((property) => PropertyDetailsModel.fromJson(property))
-          .toList() ?? [],
+     
       appVersion: json['appVersion'] ?? '',
+      bio: json['bio'],
+      email: json['email'] ?? '',
+      location: json['location'] ?? '',
+      occupation: json['occupation'] ?? '',
+      interests: json['interests'] ?? '',
+      age: json['age'] != null ? int.tryParse(json['age'].toString()) : null,
+       properties:
+          (json['properties'] as List<dynamic>?)
+              ?.map((property) => PropertyDetailsModel.fromJson(property))
+              .toList() ??
+          [],
+
     );
   }
 
@@ -59,8 +80,16 @@ class UserProfileDataModel {
       'name': name,
       'phone': phone,
       'avatar': avatar,
-      'properties': properties.map((property) => property.toJson()).toList(),
+      
       'appVersion': appVersion,
+      'bio': bio,
+      'email': email,
+      'location': location,
+      'occupation': occupation,
+      'interests': interests,
+      'age': age,
+      'properties': properties.map((property) => property.toJson()).toList(),
+
     };
   }
 }

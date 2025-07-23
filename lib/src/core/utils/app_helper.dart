@@ -105,4 +105,9 @@ class AppHelper {
     // Convert XFile to File
     return compressedXFile != null ? File(compressedXFile.path) : null;
   }
+
+  static String truncateText(String text, double screenWidth) {
+    int maxLength = screenWidth > 400 ? 15 : 12; // Adjust based on screen size
+    return text.length > maxLength ? '${text.substring(0, maxLength)}...' : text;
+  }
 }

@@ -319,7 +319,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
                 width: screenWidth * 0.12,
                 height: screenWidth * 0.12,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(screenWidth * 0.06),
                 ),
                 child: Icon(
@@ -351,7 +351,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
                 width: screenWidth * 0.12,
                 height: screenWidth * 0.12,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(screenWidth * 0.06),
                 ),
                 child: Icon(
@@ -381,14 +381,14 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
                   decoration: InputDecoration(
                     hintText: "Search by title",
                     hintStyle: GoogleFonts.lato(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha:0.7),
                       fontSize: isSmallScreen
                           ? screenWidth * 0.035
                           : screenWidth * 0.04,
                     ),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha:0.7),
                       size: screenWidth * 0.05,
                     ),
                     border: InputBorder.none,
@@ -410,7 +410,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
                 width: screenWidth * 0.12,
                 height: screenWidth * 0.12,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(screenWidth * 0.06),
                 ),
                 child: Icon(
@@ -584,7 +584,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
               ),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withOpacity(0.3)
+                    ? Colors.white.withValues(alpha:0.3)
                     : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -778,7 +778,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1001,7 +1001,7 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha:0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

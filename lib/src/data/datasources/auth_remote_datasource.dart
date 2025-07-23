@@ -114,7 +114,7 @@ Future<UserProfileResponseModel> getUserProfile(String userId) async {
 
     if (response.statusCode == 200) {
       final profileResponse = UserProfileResponseModel.fromJson(response.data);
-      
+      print(profileResponse.data.toJson());
       if (!profileResponse.success) {
         throw ServerException(profileResponse.message);
       }

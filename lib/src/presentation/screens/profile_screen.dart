@@ -251,7 +251,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -273,7 +273,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             width: screenWidth * 0.12,
             height: screenWidth * 0.12,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(screenWidth * 0.06),
             ),
             child: Icon(
@@ -298,7 +298,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -317,7 +317,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(screenWidth * 0.075),
                     child: Image.network(
-                      userProfile.avatar!,
+                      'https://api.propertymanageruae.com/api/v1/complaints/image/${userProfile.avatar!}',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.person,
@@ -399,7 +399,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -551,7 +551,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -716,7 +716,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             //           color: Colors.grey.shade50,
             //           borderRadius: BorderRadius.circular(12),
             //           border: Border.all(
-            //             color: AppConstants.purple50.withOpacity(0.3),
+            //             color: AppConstants.purple50.withValues(alpha:0.3),
             //           ),
             //         ),
             //         child: Row(
@@ -840,7 +840,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -918,7 +918,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -1258,7 +1258,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -1281,7 +1281,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       width: screenWidth * 0.1,
                       height: screenWidth * 0.1,
                       decoration: BoxDecoration(
-                        color: item.color.withOpacity(0.1),
+                        color: item.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -1363,7 +1363,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => EditProfileScreen(
+          memberId: userId!,
           initialProfile: userProfile, // Pass current profile data
+    
         ),
       ),
     ),

@@ -694,14 +694,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   fontSize: 16,
                 ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.9), // More opaque white background
+                fillColor: Colors.white.withValues(alpha:0.9), // More opaque white background
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha:0.3)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha:0.5)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -831,9 +831,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7), // Semi-transparent white
+                color: Colors.white.withValues(alpha:0.7), // Semi-transparent white
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.5)),
+                border: Border.all(color: Colors.white.withValues(alpha:0.5)),
               ),
               child: Row(
                 children: [
@@ -895,14 +895,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   letterSpacing: 3.0,
                 ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.9), // More opaque white background
+                fillColor: Colors.white.withValues(alpha:0.9), // More opaque white background
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha:0.3)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha:0.5)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -979,7 +979,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha:0.1),
                 ),
                 child: TextButton.icon(
                   onPressed: _handleResendOtp,
@@ -1143,7 +1143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   .copyWith(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha:0.9),
                                     letterSpacing: 0.1,
                                     height: 1.1,
                                     shadows: const [
@@ -1170,23 +1170,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       height: formHeight,
                       decoration: BoxDecoration(
                         // Glassmorphism effect
-                        color: Colors.white.withOpacity(0.25),
+                        color: Colors.white.withValues(alpha:0.25),
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30),
                         ),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           width: 1,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha:0.1),
                             blurRadius: 25,
                             offset: const Offset(0, -8),
                           ),
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha:0.1),
                             blurRadius: 10,
                             offset: const Offset(0, -2),
                           ),
@@ -1202,8 +1202,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.white.withOpacity(0.3),
-                              Colors.white.withOpacity(0.1),
+                              Colors.white.withValues(alpha:0.3),
+                              Colors.white.withValues(alpha:0.1),
                             ],
                           ),
                         ),

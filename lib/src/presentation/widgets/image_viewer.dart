@@ -271,8 +271,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.8),
-            Colors.black.withOpacity(0.4),
+            Colors.black.withValues(alpha:0.8),
+            Colors.black.withValues(alpha:0.4),
             Colors.transparent,
           ],
         ),
@@ -289,10 +289,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
                   width: screenWidth * 0.12,
                   height: screenWidth * 0.12,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(screenWidth * 0.06),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       width: 1,
                     ),
                   ),
@@ -340,10 +340,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
                   width: screenWidth * 0.12,
                   height: screenWidth * 0.12,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(screenWidth * 0.06),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       width: 1,
                     ),
                   ),
@@ -368,8 +368,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withOpacity(0.8),
-            Colors.black.withOpacity(0.4),
+            Colors.black.withValues(alpha:0.8),
+            Colors.black.withValues(alpha:0.4),
             Colors.transparent,
           ],
         ),
@@ -385,10 +385,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
                 width: double.infinity,
                 padding: EdgeInsets.all(screenWidth * 0.04),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha:0.6),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     width: 1,
                   ),
                 ),
@@ -421,7 +421,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
                     child: _buildActionButton(
                       "Remove",
                       Icons.delete_outline,
-                      Colors.red.withOpacity(0.8),
+                      Colors.red.withValues(alpha:0.8),
                       () => _removeImage(),
                       screenWidth,
                     ),
@@ -431,7 +431,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
                     child: _buildActionButton(
                       "Share",
                       Icons.share_outlined,
-                      const Color(0xFF10B981).withOpacity(0.8),
+                      const Color(0xFF10B981).withValues(alpha:0.8),
                       () => _shareImage(),
                       screenWidth,
                     ),
@@ -494,7 +494,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha:0.2), width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

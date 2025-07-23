@@ -240,16 +240,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       width: illustrationSize * 0.55,
                       height: illustrationSize * 0.55,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
+                        color: Colors.white.withValues(alpha:0.95),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
+                            color: Colors.black.withValues(alpha:0.15),
                             blurRadius: isSmallScreen ? 40 : 60,
                             offset: const Offset(0, 15),
                           ),
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha:0.1),
                             blurRadius: 0,
                             spreadRadius: isSmallScreen ? 15 : 20,
                           ),
@@ -317,11 +317,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               width: elementSizes[index],
               height: elementSizes[index],
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha:0.9),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: isSmallScreen ? 20 : 30,
                     offset: const Offset(0, 8),
                   ),
@@ -382,7 +382,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   isTablet,
                   isSmallScreen,
                 ),
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha:0.8),
                 height: 1.4,
                 fontWeight: FontWeight.w400,
               ),
@@ -438,7 +438,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               'Swipe to explore features →',
               style: TextStyle(
                 fontSize: size.width * 0.03,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha:0.6),
               ),
             ),
 
@@ -462,12 +462,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   decoration: BoxDecoration(
                     color: _currentPage == index
                         ? const Color(0xFFFFD700)
-                        : Colors.white.withOpacity(0.3),
+                        : Colors.white.withValues(alpha:0.3),
                     shape: BoxShape.circle,
                     boxShadow: _currentPage == index
                         ? [
                             BoxShadow(
-                              color: const Color(0xFFFFD700).withOpacity(0.5),
+                              color: const Color(0xFFFFD700).withValues(alpha:0.5),
                               blurRadius: 15,
                             ),
                           ]
@@ -490,12 +490,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFD700).withOpacity(0.3),
+                    color: const Color(0xFFFFD700).withValues(alpha:0.3),
                     blurRadius: isSmallScreen ? 25 : 35,
                     offset: const Offset(0, 12),
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha:0.1),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -533,12 +533,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           //           : null,//
           //       boxShadow: [
           //         BoxShadow(
-          //           color: const Color(0xFFFFD700).withOpacity(0.3),
+          //           color: const Color(0xFFFFD700).withValues(alpha:0.3),
           //           blurRadius: isSmallScreen ? 25 : 35,
           //           offset: const Offset(0, 12),
           //         ),
           //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.1),
+          //           color: Colors.black.withValues(alpha:0.1),
           //           blurRadius: 15,
           //           offset: const Offset(0, 5),
           //         ),
@@ -613,9 +613,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFFff6b9d).withOpacity(0.6),
-                      const Color(0xFFc471ed).withOpacity(0.6),
-                      const Color(0xFF12c2e9).withOpacity(0.6),
+                      const Color(0xFFff6b9d).withValues(alpha:0.6),
+                      const Color(0xFFc471ed).withValues(alpha:0.6),
+                      const Color(0xFF12c2e9).withValues(alpha:0.6),
                     ],
                   ),
                 ),
@@ -642,8 +642,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFFff6b9d).withOpacity(0.4),
-                      const Color(0xFFc471ed).withOpacity(0.4),
+                      const Color(0xFFff6b9d).withValues(alpha:0.4),
+                      const Color(0xFFc471ed).withValues(alpha:0.4),
                     ],
                   ),
                 ),

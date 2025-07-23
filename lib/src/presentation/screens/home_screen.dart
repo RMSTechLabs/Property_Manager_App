@@ -262,7 +262,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             controller: controller,
             focusNode: focusNode,
             style: GoogleFonts.lato(
-              color: Colors.black,
+              color: AppConstants.white50,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),

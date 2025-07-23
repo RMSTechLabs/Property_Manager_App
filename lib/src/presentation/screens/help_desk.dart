@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:property_manager_app/src/core/utils/app_helper.dart';
 import 'package:property_manager_app/src/data/models/ticket_model.dart';
 import 'package:property_manager_app/src/presentation/providers/complaint_provider.dart';
 import 'package:property_manager_app/src/presentation/screens/create_complaint_screen.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
 import 'package:property_manager_app/src/core/router/app_router.dart';
+
 class HelpDeskScreen extends ConsumerStatefulWidget {
   const HelpDeskScreen({super.key});
 
@@ -38,7 +40,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
     // _loadTickets();
   }
 
-   @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ModalRoute? route = ModalRoute.of(context);
@@ -46,8 +48,6 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
       routeObserver.subscribe(this, route);
     }
   }
-
-  
 
   @override
   void dispose() {
@@ -234,7 +234,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha:0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -351,7 +351,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -441,48 +441,64 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
 
             SizedBox(height: screenWidth * 0.03),
 
-            // Footer Row
+            // Footer Row - Fixed for overflow
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.comment_outlined,
-                      size: screenWidth * 0.04,
-                      color: AppConstants.black50,
-                    ),
-                    SizedBox(width: screenWidth * 0.01),
-                    Text(
-                      "${ticket.responseCount} Responses",
-                      style: GoogleFonts.lato(
-                        fontSize: screenWidth * 0.032,
+                // Left side - Response count
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.comment_outlined,
+                        size: screenWidth * 0.04,
                         color: AppConstants.black50,
                       ),
-                    ),
-                  ],
+                      SizedBox(width: screenWidth * 0.01),
+                      Flexible(
+                        child: Text(
+                          "${ticket.responseCount} Responses",
+                          style: GoogleFonts.lato(
+                            fontSize: screenWidth * 0.032,
+                            color: AppConstants.black50,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Created By : ${ticket.createdBy}",
-                      style: GoogleFonts.lato(
-                        fontSize: screenWidth * 0.028,
-                        color: AppConstants.black50,
-                      ),
-                    ),
-                    if (ticket.assignee != "NA") ...[
-                      SizedBox(height: screenWidth * 0.01),
+
+                // Right side - Created by and Assignee
+                Flexible(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
                       Text(
-                        "Assignee: ${ticket.assignee}",
+                        "Created By : ${AppHelper.truncateText(ticket.createdBy, screenWidth)}",
                         style: GoogleFonts.lato(
                           fontSize: screenWidth * 0.028,
                           color: AppConstants.black50,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
+                      if (ticket.assignee != "NA") ...[
+                        SizedBox(height: screenWidth * 0.01),
+                        Text(
+                          "Assignee: ${AppHelper.truncateText(ticket.assignee, screenWidth)}",
+                          style: GoogleFonts.lato(
+                            fontSize: screenWidth * 0.028,
+                            color: AppConstants.black50,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -562,7 +578,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha:0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -584,7 +600,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha:0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -676,7 +692,7 @@ class _HelpDeskScreenState extends ConsumerState<HelpDeskScreen>
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha:0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

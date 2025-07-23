@@ -61,7 +61,7 @@ class ComplaintNotifier extends AsyncNotifier<List<TicketModel>> {
 
   Future<List<TicketModel>> _fetchComplaints() async {
     final dio = ref.read(dioProvider);
-    final selectedCommunity = ref.read(selectedCommunityProvider);
+    final selectedCommunity = ref.watch(selectedCommunityProvider);
 
     if (selectedCommunity == null) return [];
 

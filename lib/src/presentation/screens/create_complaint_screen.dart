@@ -159,7 +159,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -633,7 +633,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
                   border: Border.all(color: Colors.grey.shade300),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -661,7 +661,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
                   border: Border.all(color: Colors.grey.shade300),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -1005,22 +1005,35 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
     }
 
     if (_selectedCategoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a category'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text('Please select a category'),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
+      if (mounted) {
+        AppSnackBar.showError(
+          context: context,
+          message: 'Please select a category',
+        );
+      }
       return;
     }
 
     if (_selectedLocation == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a location'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text('Please select a location'),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
+      if (mounted) {
+        AppSnackBar.showError(
+          context: context,
+          message: 'Please select a location',
+        );
+      }
+
       return;
     }
 

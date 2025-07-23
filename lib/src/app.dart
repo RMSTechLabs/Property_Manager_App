@@ -122,7 +122,7 @@ class _AppState extends ConsumerState<App> {
   //     // Card theme
   //     cardTheme: CardThemeData(
   //       elevation: 2,
-  //       shadowColor: Colors.black.withOpacity(0.1),
+  //       shadowColor: Colors.black.withValues(alpha:0.1),
   //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   //     ),
@@ -344,7 +344,7 @@ class _AppState extends ConsumerState<App> {
 
       cardTheme: CardThemeData(
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha:0.1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
@@ -410,8 +410,8 @@ class _AppState extends ConsumerState<App> {
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: primaryGradientStart.withOpacity(0.1),
-        selectedColor: primaryGradientEnd.withOpacity(0.3),
+        backgroundColor: primaryGradientStart.withValues(alpha:0.1),
+        selectedColor: primaryGradientEnd.withValues(alpha:0.3),
         disabledColor: Colors.grey[200],
         labelStyle: const TextStyle(fontSize: 12),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

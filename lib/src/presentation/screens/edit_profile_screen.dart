@@ -1,13 +1,15 @@
 // lib/src/presentation/screens/profile/edit_profile_screen.dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:property_manager_app/src/presentation/providers/auth_state_provider.dart';
-import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
 import 'package:property_manager_app/src/core/constants/app_constants.dart';
+import 'package:property_manager_app/src/core/utils/app_snackbar.dart';
+import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
+import 'package:property_manager_app/src/data/services/user/user_service_impl.dart';
 
 // Data models for edit profile
 class EditProfileData {
@@ -34,12 +36,12 @@ class EditProfileData {
   factory EditProfileData.fromUserProfile(UserProfileDataModel profile) {
     return EditProfileData(
       name: profile.name,
-      bio: '', // Add bio field to your API response if needed
-      email: '', // Add email field to your API response if needed
-      age: '',
-      location: '',
-      occupation: '',
-      interests: [],
+      bio: profile.bio ?? '', // Add bio field to your API response if needed
+      email: profile.email, // Add email field to your API response if needed
+      age: profile.age.toString(),
+      location: profile.location ?? '',
+      occupation: profile.occupation ?? '',
+      interests: profile.interests != null ? profile.interests!.split(',') : [],
       avatarPath: profile.avatar,
     );
   }
@@ -83,10 +85,12 @@ const List<InterestOption> availableInterests = [
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   final UserProfileDataModel? initialProfile;
+  final String memberId;
 
   const EditProfileScreen({
     super.key,
     this.initialProfile,
+    required this.memberId,
   });
 
   @override
@@ -96,7 +100,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late EditProfileData _profileData;
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controllers
   late TextEditingController _nameController;
   late TextEditingController _bioController;
@@ -137,7 +141,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _emailController = TextEditingController(text: _profileData.email);
     _ageController = TextEditingController(text: _profileData.age);
     _locationController = TextEditingController(text: _profileData.location);
-    _occupationController = TextEditingController(text: _profileData.occupation);
+    _occupationController = TextEditingController(
+      text: _profileData.occupation,
+    );
   }
 
   @override
@@ -202,7 +208,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -226,7 +232,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -290,7 +296,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -316,7 +322,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(screenWidth * 0.15),
                   border: Border.all(
-                    color: AppConstants.purple50.withOpacity(0.3),
+                    color: AppConstants.purple50.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -361,11 +367,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           height: screenWidth * 0.3,
         ),
       );
-    } else if (_profileData.avatarPath != null && _profileData.avatarPath!.isNotEmpty) {
+    } else if (_profileData.avatarPath != null &&
+        _profileData.avatarPath!.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(screenWidth * 0.15),
         child: Image.network(
-          _profileData.avatarPath!,
+          'https://api.propertymanageruae.com/api/v1/complaints/image/${_profileData.avatarPath!}',
           fit: BoxFit.cover,
           width: screenWidth * 0.3,
           height: screenWidth * 0.3,
@@ -407,7 +414,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppConstants.purple50, width: 2),
+            borderSide: const BorderSide(
+              color: AppConstants.purple50,
+              width: 2,
+            ),
           ),
           contentPadding: EdgeInsets.all(screenWidth * 0.04),
         ),
@@ -448,7 +458,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppConstants.purple50, width: 2),
+                borderSide: const BorderSide(
+                  color: AppConstants.purple50,
+                  width: 2,
+                ),
               ),
               contentPadding: EdgeInsets.all(screenWidth * 0.04),
               counterStyle: GoogleFonts.lato(
@@ -482,6 +495,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               }
               return null;
             },
+            enabled: false,
           ),
           SizedBox(height: screenWidth * 0.04),
           _buildTextField(
@@ -521,6 +535,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     required Function(String) onChanged,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    bool enabled = true,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,6 +551,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         SizedBox(height: screenWidth * 0.02),
         TextFormField(
           controller: controller,
+          enabled: enabled,
           keyboardType: keyboardType,
           style: GoogleFonts.lato(
             fontSize: screenWidth * 0.04,
@@ -553,7 +569,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppConstants.purple50, width: 2),
+              borderSide: const BorderSide(
+                color: AppConstants.purple50,
+                width: 2,
+              ),
             ),
             contentPadding: EdgeInsets.all(screenWidth * 0.04),
           ),
@@ -600,10 +619,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     vertical: screenWidth * 0.025,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppConstants.purple50 : Colors.grey.shade100,
+                    color: isSelected
+                        ? AppConstants.purple50
+                        : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? AppConstants.purple50 : Colors.grey.shade300,
+                      color: isSelected
+                          ? AppConstants.purple50
+                          : Colors.grey.shade300,
                     ),
                   ),
                   child: Row(
@@ -620,7 +643,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         style: GoogleFonts.lato(
                           fontSize: screenWidth * 0.035,
                           color: isSelected ? Colors.white : AppConstants.black,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                     ],
@@ -647,7 +672,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -705,7 +730,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 () => _pickImage(ImageSource.gallery),
                 screenWidth,
               ),
-              if (_selectedImage != null || (_profileData.avatarPath?.isNotEmpty ?? false))
+              if (_selectedImage != null ||
+                  (_profileData.avatarPath?.isNotEmpty ?? false))
                 _buildPhotoOption(
                   'Remove Photo',
                   Icons.delete,
@@ -748,8 +774,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           color: isDestructive
               ? Colors.red.shade50
               : isCancel
-                  ? Colors.grey.shade100
-                  : AppConstants.purple50.withOpacity(0.1),
+              ? Colors.grey.shade100
+              : AppConstants.purple50.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -760,8 +786,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               color: isDestructive
                   ? Colors.red.shade600
                   : isCancel
-                      ? AppConstants.black50
-                      : AppConstants.purple50,
+                  ? AppConstants.black50
+                  : AppConstants.purple50,
               size: screenWidth * 0.06,
             ),
             SizedBox(width: screenWidth * 0.04),
@@ -773,8 +799,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 color: isDestructive
                     ? Colors.red.shade600
                     : isCancel
-                        ? AppConstants.black50
-                        : AppConstants.black,
+                    ? AppConstants.black50
+                    : AppConstants.black,
               ),
             ),
           ],
@@ -798,7 +824,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         });
       }
     } catch (e) {
-      _showSnackBar('Failed to pick image. Please try again.', Colors.red);
+      if (mounted) {
+        AppSnackBar.showError(
+          context: context,
+          message: 'Failed to pick image. Please try again.',
+        );
+      }
     }
   }
 
@@ -816,7 +847,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       });
 
       try {
-        // Update profile data with current form values
+        final userService = ref.read(userServiceProvider);
+        // Set updated values from the form
         _profileData.name = _nameController.text.trim();
         _profileData.bio = _bioController.text.trim();
         _profileData.email = _emailController.text.trim();
@@ -824,20 +856,56 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         _profileData.location = _locationController.text.trim();
         _profileData.occupation = _occupationController.text.trim();
 
-        // Here you would call your edit profile API
-        // await ref.read(editProfileUseCaseProvider).call(_profileData, _selectedImage);
-        
-        // Simulate API call
-        await Future.delayed(const Duration(seconds: 2));
-        
-        _showSnackBar('Profile updated successfully!', Colors.green);
-        
-        // Navigate back
-        if (mounted) {
-          context.pop();
+        String interestList = _profileData.interests.join(',');
+
+        // 🔁 Convert DTO to Map
+        Map<String, dynamic> body = {
+          'name': _profileData.name,
+          'email': _profileData.email,
+          'profileUrl': _profileData.avatarPath,
+          'age':
+              int.tryParse(_profileData.age) ??
+              0, // if age is string in controller
+          'location': _profileData.location,
+          'occupation': _profileData.occupation,
+          'interests': interestList,
+          'bio': _profileData.bio,
+        };
+
+        // File path for profile image
+        final filePath = _selectedImage?.path; // nullable
+
+        final response = await userService.updateProfile(
+          body,
+          filePath,
+          widget.memberId,
+        );
+        print(response);
+
+        if (response.statusCode == 200) {
+          if (mounted) {
+            AppSnackBar.showSuccess(
+              context: context,
+              message: 'User profile updated successfully!',
+            );
+            context.pop(); // or Navigator.pop(context);
+          }
+        } else {
+          if (mounted) {
+            AppSnackBar.showError(
+              context: context,
+              message:
+                  '${response.data['message'] ?? 'Failed to update user profile'}',
+            );
+          }
         }
       } catch (e) {
-        _showSnackBar('Failed to update profile. Please try again.', Colors.red);
+        if (mounted) {
+          AppSnackBar.showError(
+            context: context,
+            message: 'Failed to update profile. Please try again. $e',
+          );
+        }
       } finally {
         if (mounted) {
           setState(() {
@@ -917,28 +985,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     if (shouldDiscard == true && mounted) {
       context.pop();
-    }
-  }
-
-  void _showSnackBar(String message, Color backgroundColor) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          backgroundColor: backgroundColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-        ),
-      );
     }
   }
 }
