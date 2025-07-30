@@ -1472,12 +1472,12 @@
 
 //   // Action methods
 //   void _attachFile() {
-//     print('Attach file');
+//     //print('Attach file');
 //     // TODO: Implement file attachment
 //   }
 
 //   void _recordVoice() {
-//     print('Record voice message');
+//     //print('Record voice message');
 //     // TODO: Implement voice recording
 //   }
 
@@ -1496,7 +1496,6 @@
 //     super.dispose();
 //   }
 // }
-
 
 // Enhanced Ticket Detail Screen with Separate Comments Provider
 import 'dart:io';
@@ -1648,7 +1647,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha:0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -1827,59 +1826,63 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
         itemBuilder: (context, index) {
           final imageUrl = images[index];
 
-          return GestureDetector(
-            onTap: () => _openImageViewerFromUrl(
-              context: context,
-              imageUrl: images[index],
-            ),
-            child: Container(
-              width: screenWidth * 0.20,
-              height: screenWidth * 0.20,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha:0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          return Material(
+             color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => _openImageViewerFromUrl(
+                context: context,
+                imageUrl: images[index],
               ),
-              child: Hero(
-                tag: 'ticket_image_$index',
-                child: ClipRRect(
+              child: Container(
+                width: screenWidth * 0.20,
+                height: screenWidth * 0.20,
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.grey.shade200,
-                        child: Center(
-                          child: SizedBox(
-                            width: screenWidth * 0.05,
-                            height: screenWidth * 0.05,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: const Color(0xFF5A5FFF),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Hero(
+                  tag: 'ticket_image_$index',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Center(
+                            child: SizedBox(
+                              width: screenWidth * 0.05,
+                              height: screenWidth * 0.05,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: const Color(0xFF5A5FFF),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey.shade100,
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: screenWidth * 0.08,
-                          color: Colors.grey.shade400,
-                        ),
-                      );
-                    },
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade100,
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: screenWidth * 0.08,
+                            color: Colors.grey.shade400,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -1929,48 +1932,48 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 horizontal: screenWidth * 0.03,
                 vertical: screenWidth * 0.01,
               ),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedVisibility,
-                  icon: Icon(
-                    Icons.keyboard_arrow_down,
-                    color: AppConstants.black50,
-                    size: screenWidth * 0.04,
-                  ),
-                  style: GoogleFonts.lato(
-                    color: AppConstants.black,
-                    fontSize: screenWidth * 0.032,
-                  ),
-                  items: _visibilityOptions.map((String option) {
-                    return DropdownMenuItem<String>(
-                      value: option,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.visibility_outlined,
-                            size: screenWidth * 0.035,
-                            color: AppConstants.black50,
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Text(option),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedVisibility = newValue;
-                      });
-                    }
-                  },
-                ),
-              ),
+              // decoration: BoxDecoration(
+              //   color: Colors.grey.shade200,
+              //   borderRadius: BorderRadius.circular(8),
+              // ),
+              // child: DropdownButtonHideUnderline(
+              //   child: DropdownButton<String>(
+              //     value: _selectedVisibility,
+              //     icon: Icon(
+              //       Icons.keyboard_arrow_down,
+              //       color: AppConstants.black50,
+              //       size: screenWidth * 0.04,
+              //     ),
+              //     style: GoogleFonts.lato(
+              //       color: AppConstants.black,
+              //       fontSize: screenWidth * 0.032,
+              //     ),
+              //     items: _visibilityOptions.map((String option) {
+              //       return DropdownMenuItem<String>(
+              //         value: option,
+              //         child: Row(
+              //           mainAxisSize: MainAxisSize.min,
+              //           children: [
+              //             Icon(
+              //               Icons.visibility_outlined,
+              //               size: screenWidth * 0.035,
+              //               color: AppConstants.black50,
+              //             ),
+              //             SizedBox(width: screenWidth * 0.02),
+              //             Text(option),
+              //           ],
+              //         ),
+              //       );
+              //     }).toList(),
+              //     onChanged: (String? newValue) {
+              //       if (newValue != null) {
+              //         setState(() {
+              //           _selectedVisibility = newValue;
+              //         });
+              //       }
+              //     },
+              //   ),
+              // ),
             ),
 
             // Assignee
@@ -1985,7 +1988,10 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                   ),
                 ),
                 Text(
-                  AppHelper.truncateText(ticketDetail?.assignee ?? 'N/A', screenWidth),
+                  AppHelper.truncateText(
+                    ticketDetail?.assignee ?? 'N/A',
+                    screenWidth,
+                  ),
                   style: GoogleFonts.lato(
                     fontSize: screenWidth * 0.035,
                     fontWeight: FontWeight.w500,
@@ -2142,25 +2148,58 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     );
   }
 
+  Widget _buildDefaultProfileIcon(double screenWidth) {
+    return Container(
+      width: screenWidth * 0.1,
+      height: screenWidth * 0.1,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(screenWidth * 0.05),
+      ),
+      child: Icon(
+        Icons.person,
+        color: Colors.grey.shade600,
+        size: screenWidth * 0.05,
+      ),
+    );
+  }
+
   Widget _buildCommentItem(CommentModel comment, double screenWidth) {
+
+    final bool hasProfileImage = comment.profileUrl=="" ?false:true;
     return Container(
       margin: EdgeInsets.only(bottom: screenWidth * 0.04),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Avatar
-          Container(
-            width: screenWidth * 0.1,
-            height: screenWidth * 0.1,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(screenWidth * 0.05),
-            ),
-            child: Icon(
-              Icons.person,
-              color: Colors.grey.shade600,
-              size: screenWidth * 0.05,
-            ),
+          // Container(
+          //   width: screenWidth * 0.1,
+          //   height: screenWidth * 0.1,
+          //   decoration: BoxDecoration(
+          //     color: Colors.grey.shade300,
+          //     borderRadius: BorderRadius.circular(screenWidth * 0.05),
+          //   ),
+          //   child: Icon(
+          //     Icons.person,
+          //     color: Colors.grey.shade600,
+          //     size: screenWidth * 0.05,
+          //   ),
+          // ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(screenWidth * 0.05),
+            child: hasProfileImage
+                ? Image.network(
+                    comment.profileUrl,
+                    width: screenWidth * 0.1,
+                    height: screenWidth * 0.1,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback if image fails to load
+                      return _buildDefaultProfileIcon(screenWidth);
+                    },
+                  )
+                : _buildDefaultProfileIcon(screenWidth),
           ),
 
           SizedBox(width: screenWidth * 0.03),
@@ -2241,70 +2280,77 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                             border: Border.all(color: Colors.grey.shade300),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha:0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          child: GestureDetector(
-                            onTap: () => _openImageViewerFromUrl(
-                              context: context,
-                              imageUrl: comment.images[index],
-                            ),
-                            child: Hero(
-                              tag: 'comment_image_${comment.id}_$index',
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  comment.images[index],
-                                  width: screenWidth * 0.20,
-                                  height: screenWidth * 0.20,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: screenWidth * 0.20,
-                                      height: screenWidth * 0.20,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade300,
-                                        borderRadius: BorderRadius.circular(
-                                          screenWidth * 0.02,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        Icons.error_outline,
-                                        color: Colors.grey.shade600,
-                                        size: screenWidth * 0.06,
-                                      ),
-                                    );
-                                  },
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      width: screenWidth * 0.25,
-                                      height: screenWidth * 0.25,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
-                                        borderRadius: BorderRadius.circular(
-                                          screenWidth * 0.02,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: screenWidth * 0.05,
-                                          height: screenWidth * 0.05,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                              Colors.grey.shade600,
-                                            ),
+                          child: Material(
+                            color: Colors.transparent,
+                            
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () => _openImageViewerFromUrl(
+                                context: context,
+                                imageUrl: comment.images[index],
+                              ),
+                              child: Hero(
+                                tag: 'comment_image_${comment.id}_$index',
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    comment.images[index],
+                                    width: screenWidth * 0.20,
+                                    height: screenWidth * 0.20,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: screenWidth * 0.20,
+                                        height: screenWidth * 0.20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade300,
+                                          borderRadius: BorderRadius.circular(
+                                            screenWidth * 0.02,
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                        child: Icon(
+                                          Icons.error_outline,
+                                          color: Colors.grey.shade600,
+                                          size: screenWidth * 0.06,
+                                        ),
+                                      );
+                                    },
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return Container(
+                                            width: screenWidth * 0.25,
+                                            height: screenWidth * 0.25,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade200,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    screenWidth * 0.02,
+                                                  ),
+                                            ),
+                                            child: Center(
+                                              child: SizedBox(
+                                                width: screenWidth * 0.05,
+                                                height: screenWidth * 0.05,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                        Color
+                                                      >(Colors.grey.shade600),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                  ),
                                 ),
                               ),
                             ),
@@ -2332,7 +2378,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -2613,24 +2659,24 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 () => _handleImageSelection(ImageSource.camera),
                 screenWidth,
               ),
-              _buildAttachmentOption(
-                "Take Video",
-                Icons.videocam,
-                () => _handleVideoSelection(ImageSource.camera),
-                screenWidth,
-              ),
+              // _buildAttachmentOption(
+              //   "Take Video",
+              //   Icons.videocam,
+              //   () => _handleVideoSelection(ImageSource.camera),
+              //   screenWidth,
+              // ),
               _buildAttachmentOption(
                 "Add Documents",
                 Icons.folder,
                 () => _handleDocumentSelection(),
                 screenWidth,
               ),
-              _buildAttachmentOption(
-                "Choose from Library",
-                Icons.photo_library,
-                () => _handleImageSelection(ImageSource.gallery),
-                screenWidth,
-              ),
+              // _buildAttachmentOption(
+              //   "Choose from Library",
+              //   Icons.photo_library,
+              //   () => _handleImageSelection(ImageSource.gallery),
+              //   screenWidth,
+              // ),
               SizedBox(height: screenWidth * 0.03),
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -2689,12 +2735,13 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     )) {
       final XFile? image = await _picker.pickImage(source: source);
       final File? originalFile = image != null ? File(image.path) : null; //
-      if (originalFile != null) {//
+      if (originalFile != null) {
+        //
         final File? compressedFile = await AppHelper.compressImage(
           originalFile,
         ); //
         setState(() {
-          _selectedFiles.add(compressedFile!);//
+          _selectedFiles.add(compressedFile!); //
         });
       }
     }
@@ -2931,7 +2978,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
   // Action methods
   void _recordVoice() {
-    print('Record voice message');
+    //print('Record voice message');
     // TODO: Implement voice recording
   }
 

@@ -1075,7 +1075,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         BlendMode.modulate,
                       ),
                       onError: (exception, stackTrace) {
-                        debugPrint('Image loading error: $exception');
+                        // debug//print('Image loading error: $exception');
                       },
                     ),
                   ),

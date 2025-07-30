@@ -30,45 +30,48 @@ class _LocationSelectionScreenState
   }
 
   void _loadLocations() async {
-    try {
-      final societyState = ref.read(societyStateProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      try {
+        final societyState = ref.read(societyStateProvider);
 
-      // Extract locations from society data
-      if (societyState.societies.isNotEmpty) {
+        // Extract locations from society data
+        if (societyState.societies.isNotEmpty) {
+          setState(() {
+            _allLocations = societyState.societies
+                .map(
+                  (society) => LocationModel(
+                    id: society.id ?? "1",
+                    locationName: "${society.block}-${society.flat}",
+                    apartmentId: society.apartmentId ?? "1",
+                    areaId: society.areaId ?? "1",
+                    societyId: society.societyId ?? "1",
+                  ),
+                )
+                .toList();
+            _filteredLocations = List.from(_allLocations);
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
         setState(() {
-          _allLocations = societyState.societies
-              .map(
-                (society) => LocationModel(
-                  id: society.id ?? "1",
-                  locationName: "${society.block}-${society.flat}",
-                  apartmentId: society.apartmentId ?? "1",
-                  areaId: society.areaId ?? "1",
-                  societyId: society.societyId ?? "1",
-                ),
-              )
-              .toList();
-          _filteredLocations = List.from(_allLocations);
           _isLoading = false;
         });
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text('Error loading locations: $e')),
+          // );
+          AppSnackBar.showError(
+            context: context,
+            message: 'Error loading locations: $e',
+          );
+        }
       }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Error loading locations: $e')),
-        // );
-        AppSnackBar.showError(
-          context: context,
-          message: 'Error loading locations: $e',
-        );
-      }
-    }
+    });
   }
 
   void _filterLocations() {
@@ -142,7 +145,7 @@ class _LocationSelectionScreenState
               width: screenWidth * 0.12,
               height: screenWidth * 0.12,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha:0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(screenWidth * 0.06),
               ),
               child: Icon(
@@ -178,7 +181,7 @@ class _LocationSelectionScreenState
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -246,7 +249,7 @@ class _LocationSelectionScreenState
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

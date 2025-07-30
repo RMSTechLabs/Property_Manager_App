@@ -1,13 +1,16 @@
+// lib/core/widgets/error_boundary.dart
 import 'package:flutter/material.dart';
+import 'package:property_manager_app/src/presentation/widgets/error_widget.dart';
 
+/// ErrorBoundary that catches and handles errors in Flutter apps
 class ErrorBoundary extends StatefulWidget {
   final Widget child;
-  final Widget Function(Object error, StackTrace? stackTrace)? errorBuilder;
+  final void Function(Object error, StackTrace? stackTrace)? onError;
 
   const ErrorBoundary({
     super.key,
     required this.child,
-    this.errorBuilder,
+    this.onError,
   });
 
   @override
@@ -17,83 +20,122 @@ class ErrorBoundary extends StatefulWidget {
 class _ErrorBoundaryState extends State<ErrorBoundary> {
   Object? _error;
   StackTrace? _stackTrace;
+  bool _hasError = false;
 
   @override
   Widget build(BuildContext context) {
-    if (_error != null) {
-      return widget.errorBuilder?.call(_error!, _stackTrace) ??
-          _DefaultErrorWidget(error: _error!, stackTrace: _stackTrace);
+    if (_hasError && _error != null) {
+      // Show our custom error widget
+      return CustomErrorWidget(
+        error: _error!,
+        stackTrace: _stackTrace,
+        onRetry: _resetError,
+        onGoHome: () {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/',
+            (route) => false,
+          );
+        },
+      );
     }
 
-    return widget.child;
+    // Wrap child to catch errors
+    return _ErrorWrapper(
+      onError: _handleError,
+      child: widget.child,
+    );
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    FlutterError.onError = (FlutterErrorDetails details) {
+  void _handleError(Object error, StackTrace? stackTrace) {
+    // Call custom error handler if provided
+    widget.onError?.call(error, stackTrace);
+
+    // Update state safely using post-frame callback
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        if (!mounted) return;//
         setState(() {
-          _error = details.exception;
-          _stackTrace = details.stack;
+          _error = error;
+          _stackTrace = stackTrace;
+          _hasError = true;
         });
       }
-    };
+    });
+  }
+
+  void _resetError() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _error = null;
+          _stackTrace = null;
+          _hasError = false;
+        });
+      }
+    });
   }
 }
 
-class _DefaultErrorWidget extends StatelessWidget {
-  final Object error;
-  final StackTrace? stackTrace;
+/// Internal wrapper that catches errors
+class _ErrorWrapper extends StatefulWidget {
+  final Widget child;
+  final void Function(Object error, StackTrace? stackTrace) onError;
 
-  const _DefaultErrorWidget({
-    required this.error,
-    this.stackTrace,
+  const _ErrorWrapper({
+    required this.child,
+    required this.onError,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Error'),
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Something went wrong',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Restart the app or navigate to home
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/home',
-                  (route) => false,
-                );
-              },
-              child: const Text('Restart App'),
-            ),
-          ],
+  State<_ErrorWrapper> createState() => _ErrorWrapperState();
+}
+
+class _ErrorWrapperState extends State<_ErrorWrapper> {
+  ErrorWidgetBuilder? _previousErrorBuilder;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupErrorHandling();
+  }
+
+  @override
+  void dispose() {
+    _restoreErrorHandling();
+    super.dispose();
+  }
+
+  void _setupErrorHandling() {
+    // Store the previous error builder
+    _previousErrorBuilder = ErrorWidget.builder;
+
+    // Set custom error builder
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      // Handle the error
+      widget.onError(details.exception, details.stack);
+
+      // Return a simple error widget
+      return Container(
+        color: Colors.red.shade100,
+        child: Center(
+          child: Text(
+            'Error: ${details.exception}',
+            style: const TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
         ),
-      ),
-    );
+      );
+    };
+  }
+
+  void _restoreErrorHandling() {
+    // Restore previous error builder
+    if (_previousErrorBuilder != null) {
+      ErrorWidget.builder = _previousErrorBuilder!;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

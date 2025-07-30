@@ -447,27 +447,27 @@ class _NoticeBoardScreenState extends ConsumerState<NoticeBoardScreen>
         child: Row(
           children: [
             // Unread Filter
-            _buildFilterChip(
-              label: "Unread",
-              count: _unreadCount,
-              isSelected: _showUnreadOnly,
-              onTap: _toggleUnreadFilter,
-              screenWidth: screenWidth,
-            ),
-            SizedBox(width: screenWidth * 0.03),
+            // _buildFilterChip(
+            //   label: "Unread",
+            //   count: _unreadCount,
+            //   isSelected: _showUnreadOnly,
+            //   onTap: _toggleUnreadFilter,
+            //   screenWidth: screenWidth,
+            // ),
+            // SizedBox(width: screenWidth * 0.03),
 
-            // Saved Filter
-            _buildFilterChip(
-              label: "Saved",
-              count: _savedCount,
-              isSelected: _showSavedOnly,
-              onTap: _toggleSavedFilter,
-              screenWidth: screenWidth,
-              icon: Icons.bookmark_outline,
-              selectedIcon: Icons.bookmark,
-            ),
+            // // Saved Filter
+            // _buildFilterChip(
+            //   label: "Saved",
+            //   count: _savedCount,
+            //   isSelected: _showSavedOnly,
+            //   onTap: _toggleSavedFilter,
+            //   screenWidth: screenWidth,
+            //   icon: Icons.bookmark_outline,
+            //   selectedIcon: Icons.bookmark,
+            // ),
 
-            SizedBox(width: screenWidth * 0.03),
+            // SizedBox(width: screenWidth * 0.03),
 
             // Category Filter
             GestureDetector(

@@ -30,40 +30,7 @@ class _CategorySelectionScreenState
     _loadCategories();
   }
 
-  void _loadCategories() async {
-    try {
-      final societyState = ref.read(societyStateProvider);
-      final societyId = societyState.societies.isNotEmpty
-          ? societyState.societies.first.societyId
-          : "";
-
-      final complaintService = ref.read(complaintServiceProvider);
-      final categories = await complaintService.getAllCategoryList(
-        societyId.toString(),
-      );
-
-      setState(() {
-        _allCategories =
-            categories; //data.map((item) => CategoryModel.fromJson(item)).toList();
-        _filteredCategories = List.from(_allCategories);
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        // ScaffoldMessenger.of(
-        //   context,
-        // ).showSnackBar(SnackBar(content: Text('Error loading categories: $e')));
-        AppSnackBar.showError(
-          context: context,
-          message: 'Error loading categories: $e',
-        );
-      }
-    }
-  }
-
+  
   void _filterCategories() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -74,6 +41,45 @@ class _CategorySelectionScreenState
           .toList();
     });
   }
+
+  void _loadCategories() async {
+  try {
+    final societyState = ref.read(societyStateProvider);
+    final societyId = societyState.societies.isNotEmpty
+        ? societyState.societies.first.societyId
+        : "";
+
+    final complaintService = ref.read(complaintServiceProvider);
+    final categories = await complaintService.getAllCategoryList(
+      societyId.toString(),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _allCategories = categories;
+          _filteredCategories = List.from(_allCategories);
+          _isLoading = false;
+        });
+      }
+    });
+  } catch (e) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+    
+    if (mounted) {
+      AppSnackBar.showError(
+        context: context,
+        message: 'Error loading categories: $e',
+      );
+    }
+  }
+}
 
   @override
   Widget build(BuildContext context) {

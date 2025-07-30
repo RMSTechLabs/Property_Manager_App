@@ -15,7 +15,7 @@ class JwtDecoderUtil {
       // Consider token expired if it expires within the buffer time
       return expiryTime.isBefore(now.add(AppConstants.tokenRefreshBuffer));
     } catch (e) {
-      print('Error checking token expiry: $e');
+      //print('Error checking token expiry: $e');
       return true; // Assume expired if we can't decode
     }
   }
@@ -29,7 +29,7 @@ class JwtDecoderUtil {
       final decoded = decodeToken(token);
       return decoded['sub'] ?? decoded['userId'] ?? decoded['user_id'];
     } catch (e) {
-      print('Error getting user ID from token: $e');
+      //print('Error getting user ID from token: $e');
       return null;
     }
   }
@@ -39,7 +39,7 @@ class JwtDecoderUtil {
       final decoded = decodeToken(token);
       return decoded['email'];
     } catch (e) {
-      print('Error getting email from token: $e');
+      //print('Error getting email from token: $e');
       return null;
     }
   }
@@ -49,7 +49,7 @@ class JwtDecoderUtil {
       final expiryTime = getExpiryTime(token);
       return expiryTime.difference(DateTime.now());
     } catch (e) {
-      print('Error calculating time until expiry: $e');
+      //print('Error calculating time until expiry: $e');
       return Duration.zero;
     }
   }
@@ -71,7 +71,7 @@ class JwtDecoderUtil {
         return DateTime.fromMillisecondsSinceEpoch(iat * 1000);
       }
     } catch (e) {
-      print('Error getting issued at time: $e');
+      //print('Error getting issued at time: $e');
     }
     return null;
   }

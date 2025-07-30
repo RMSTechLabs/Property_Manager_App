@@ -319,7 +319,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
         suggestionsCallback: (pattern) {
-          logger.i('Searching communities with pattern: $pattern');
+          // logger.i('Searching communities with pattern: $pattern');
           if (pattern.isEmpty) {
             return communities;
           }
@@ -388,7 +388,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         },
         onSelected: (community) {
           ref.read(selectedCommunityProvider.notifier).state = community;
-          logger.i('Community changed to: ${community.id}');
+          // logger.i('Community changed to: ${community.id}');
           setState(() {
             selectedCommunity = community;
             _communityController.text = community.name.split(',')[0];
@@ -775,11 +775,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     //   context,
     //   MaterialPageRoute(builder: (context) => const PropertySelectionScreen()),
     // );
-    print('Navigate to Notify Gate');
+    //print('Navigate to Notify Gate');
   }
 
   void _navigateToNotifyGate() {
-    print('Navigate to Notify Gate');
+    //print('Navigate to Notify Gate');
   }
 
   void _showSelectCommunityAlert() {
@@ -809,7 +809,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _navigateToAmenities() {
-    print('Navigate to Amenities');
+    //print('Navigate to Amenities');
   }
 
   @override

@@ -42,7 +42,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
 
         final authResponse = AuthResponseModel.fromJson(response.data);
-        logger.i('✅ Login successful for user: ${authResponse.user.id}');
+        // logger.i('✅ Login successful for user: ${authResponse.user.id}');
 
         // Register FCM token after successful login
         try {
@@ -52,7 +52,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           );
         } catch (fcmError) {
           // Log FCM error but don't fail the login
-          logger.w('⚠️ FCM registration failed: $fcmError');
+          // logger.w('⚠️ FCM registration failed: $fcmError');
         }
         return authResponse;
       } else {
@@ -94,11 +94,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   Future<void> _registerFCMToken(String userId, String accessToken) async {
     try {
-      logger.i('🔔 Registering FCM token for user: $userId');
+      // logger.i('🔔 Registering FCM token for user: $userId');
       await fcmDataSource.registerDevice(userId, accessToken);
-      logger.i('✅ FCM token registered successfully');
+      // logger.i('✅ FCM token registered successfully');
     } catch (e) {
-      logger.e('❌ FCM token registration failed: $e');
+      // logger.e('❌ FCM token registration failed: $e');
       // Don't throw - FCM registration failure shouldn't break login
     }
   }
@@ -114,12 +114,12 @@ Future<UserProfileResponseModel> getUserProfile(String userId) async {
 
     if (response.statusCode == 200) {
       final profileResponse = UserProfileResponseModel.fromJson(response.data);
-      print(profileResponse.data.toJson());
+      //print(profileResponse.data.toJson());
       if (!profileResponse.success) {
         throw ServerException(profileResponse.message);
       }
       
-      logger.i('✅ User profile fetched successfully for user: $userId');
+      // logger.i('✅ User profile fetched successfully for user: $userId');
       return profileResponse;
     } else {
       throw ServerException(
@@ -241,7 +241,7 @@ Future<UserProfileResponseModel> getUserProfile(String userId) async {
     // Note: You might need to get userId from somewhere (maybe from stored user data)
     // For now, we'll skip FCM unregistration during logout
     // await fcmDataSource.unregisterDevice(userId, accessToken);
-    print(email);
+    //print(email);
     try {
       final response = await dio.post(
         ApiConstants.logoutEndpoint,

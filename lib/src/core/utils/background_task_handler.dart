@@ -21,11 +21,11 @@ class BackgroundTaskHandler {
       _isInitialized = true;
       
       if (kDebugMode) {
-        print('✅ Background task handler initialized');
+        //print('✅ Background task handler initialized');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Failed to initialize background task handler: $e');
+        //print('❌ Failed to initialize background task handler: $e');
       }
     }
   }
@@ -59,23 +59,23 @@ class BackgroundTaskHandler {
       
       if (!authState.isAuthenticated) {
         if (kDebugMode) {
-          print('🔄 Background refresh skipped - user not authenticated');
+          //print('🔄 Background refresh skipped - user not authenticated');
         }
         return;
       }
 
       if (kDebugMode) {
-        print('🔄 Background token refresh initiated');
+        //print('🔄 Background token refresh initiated');
       }
 
       await ref.read(authStateProvider.notifier).forceRefreshToken();
       
       if (kDebugMode) {
-        print('✅ Background token refresh completed');
+        //print('✅ Background token refresh completed');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Background token refresh failed: $e');
+        //print('❌ Background token refresh failed: $e');
       }
       
       // Schedule retry in 2 minutes on failure
@@ -90,23 +90,23 @@ class BackgroundTaskHandler {
       
       if (!authState.isAuthenticated) {
         if (kDebugMode) {
-          print('🔄 Periodic refresh skipped - user not authenticated');
+          //print('🔄 Periodic refresh skipped - user not authenticated');
         }
         return;
       }
 
       if (kDebugMode) {
-        print('🔄 Periodic token refresh initiated (9-minute cycle)');
+        //print('🔄 Periodic token refresh initiated (9-minute cycle)');
       }
 
       await ref.read(authStateProvider.notifier).forceRefreshToken();
       
       if (kDebugMode) {
-        print('✅ Periodic token refresh completed');
+        //print('✅ Periodic token refresh completed');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Periodic token refresh failed: $e');
+        //print('❌ Periodic token refresh failed: $e');
       }
     }
   }
@@ -114,7 +114,7 @@ class BackgroundTaskHandler {
   /// Force immediate refresh
   static Future<void> forceRefresh(WidgetRef ref) async {
     if (kDebugMode) {
-      print('🔄 Force refresh requested');
+      //print('🔄 Force refresh requested');
     }
     
     await _handlePeriodicRefresh(ref);
@@ -123,7 +123,7 @@ class BackgroundTaskHandler {
   /// Pause background tasks (when app goes to background)
   static void pause() {
     if (kDebugMode) {
-      print('⏸️ Background tasks paused');
+      //print('⏸️ Background tasks paused');
     }
     
     // Keep timers running but reduce frequency
@@ -133,7 +133,7 @@ class BackgroundTaskHandler {
   /// Resume background tasks (when app comes to foreground)
   static void resume(WidgetRef ref) {
     if (kDebugMode) {
-      print('▶️ Background tasks resumed');
+      //print('▶️ Background tasks resumed');
     }
     
     // Force immediate refresh when app resumes
@@ -143,7 +143,7 @@ class BackgroundTaskHandler {
   /// Stop all background tasks
   static void stop() {
     if (kDebugMode) {
-      print('⏹️ Background tasks stopped');
+      //print('⏹️ Background tasks stopped');
     }
     
     _backgroundTimer?.cancel();
@@ -158,7 +158,7 @@ class BackgroundTaskHandler {
     _isInitialized = false;
     
     if (kDebugMode) {
-      print('🗑️ Background task handler disposed');
+      //print('🗑️ Background task handler disposed');
     }
   }
 
@@ -176,7 +176,7 @@ class BackgroundTaskHandler {
   /// Reset timers (useful for testing or configuration changes)
   static void reset(WidgetRef ref) {
     if (kDebugMode) {
-      print('🔄 Resetting background task handler');
+      //print('🔄 Resetting background task handler');
     }
     
     dispose();

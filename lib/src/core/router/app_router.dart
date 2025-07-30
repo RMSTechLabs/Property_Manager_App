@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:property_manager_app/src/data/models/user_profile_response_model.dart';
 import 'package:property_manager_app/src/presentation/screens/create_complaint_screen.dart';
+import 'package:property_manager_app/src/presentation/screens/edit_profile_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/help_desk.dart';
 import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 import 'package:property_manager_app/src/presentation/screens/login_screen.dart';
@@ -27,11 +29,12 @@ class AuthRefreshNotifier extends ChangeNotifier {
     });
   }
 }
+
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   // final authNotifier = ValueNotifier<AsyncValue<void>>(const AsyncLoading());
-  // print("🙄 app router provider");
+  // //print("🙄 app router provider");
   // ref.listen(authStateProvider, (_, __) {
   //   authNotifier.value = const AsyncData(null); // Only auth changes matter now
   // });
@@ -49,8 +52,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     //   final onboardingReady = ref.read(onboardingReadyProvider);
 
     //   final location = state.matchedLocation;
-    //   print(location);
-    //   print(authState.isOtpVerified);
+    //   //print(location);
+    //   //print(authState.isOtpVerified);
     //   // Wait for both onboarding and auth to load
     //   // ⏳ Wait until both onboarding and auth are ready
     //   if (!authState.isInitialized || !onboardingReady) return null;
@@ -134,7 +137,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return NoticeDetailScreen(noticeId: noticeId);
         },
       ),
-       GoRoute(
+      GoRoute(
         path: '/ticket/:id',
         name: 'ticketDetail',
         builder: (context, state) {
@@ -159,6 +162,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/createComplaint',
         name: 'createComplaint',
         builder: (context, _) => const CreateComplaintScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile/:memberId',
+        builder: (context, state) {
+          final memberId = state.pathParameters['memberId']!;
+          final initialProfile = state.extra as UserProfileDataModel?;
+          return EditProfileScreen(
+            memberId: memberId,
+            initialProfile: initialProfile,
+          );
+        },
       ),
       // GoRoute(
       //   path: '/home',

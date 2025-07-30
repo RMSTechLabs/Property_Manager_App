@@ -38,7 +38,7 @@ import 'package:property_manager_app/src/presentation/providers/society_provider
 //       if (data.isEmpty) {
 //         return [];
 //       }
-//       print(data);
+//       //print(data);
 //       return data.map((json) => TicketModel.fromJson(json)).toList();
 //     } else {
 //       throw Exception('Server error: ${response.statusCode}');

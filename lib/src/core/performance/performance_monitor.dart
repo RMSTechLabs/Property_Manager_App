@@ -8,23 +8,23 @@ class PerformanceMonitor {
 
   void trackScreenView(String screenName) {
     if (kDebugMode) {
-      print('Screen View: $screenName');
+      //print('Screen View: $screenName');
     }
     // Add analytics tracking here
   }
 
   void trackUserAction(String action, Map<String, dynamic>? parameters) {
     if (kDebugMode) {
-      print('User Action: $action, Parameters: $parameters');
+      //print('User Action: $action, Parameters: $parameters');
     }
     // Add analytics tracking here
   }
 
   void trackError(String error, StackTrace? stackTrace) {
     if (kDebugMode) {
-      print('Error: $error');
+      //print('Error: $error');
       if (stackTrace != null) {
-        print('Stack Trace: $stackTrace');
+        //print('Stack Trace: $stackTrace');
       }
     }
     // Add crash reporting here

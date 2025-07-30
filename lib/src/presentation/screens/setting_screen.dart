@@ -57,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       settings[key] = value;
     });
     // TODO: Save to API
-    print('Setting $key changed to $value');
+    //print('Setting $key changed to $value');
   }
   
   @override
@@ -454,17 +454,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   
   // Action handlers
   void _handleNotificationIssues() {
-    print('Navigate to notification issues');
+    //print('Navigate to notification issues');
     // TODO: Navigate to notification troubleshooting page
   }
 
   void _handleNotifyInsideSociety() {
-    print('Configure inside society notifications');
+    //print('Configure inside society notifications');
     // TODO: Show location-based notification settings
   }
 
   void _handleNotifyMeFor() {
-    print('Configure notification preferences');
+    //print('Configure notification preferences');
     // TODO: Show detailed notification preferences
   }
 }

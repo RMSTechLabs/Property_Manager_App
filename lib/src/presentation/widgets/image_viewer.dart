@@ -50,7 +50,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen>
     );
 
     _overlayController.forward();
-    _loadImage();
+    // _loadImage();
   }
 
   void _loadImage() {

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:property_manager_app/src/presentation/providers/notification_provider.dart';
+import 'package:property_manager_app/src/presentation/widgets/error_boundary.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'src/app.dart';
 import 'src/core/utils/app_lifecycle_handler.dart';
@@ -18,7 +19,7 @@ import 'firebase_options.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialize Firebase if not already initialized
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print('📱 Background message: ${message.messageId}');
+  //print('📱 Background message: ${message.messageId}');
 }
 
 // final sharedPrefs = await SharedPreferences.getInstance();
@@ -31,14 +32,14 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('🔥 Firebase initialized successfully');
+    //print('🔥 Firebase initialized successfully');
 
     // Set background message handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // Initialize SharedPreferences
     // final sharedPrefs = await SharedPreferences.getInstance();
-    // print('💾 SharedPreferences initialized');
+    // //print('💾 SharedPreferences initialized');
 
     // Initialize error handling
     await _initializeErrorHandling();
@@ -51,24 +52,28 @@ void main() async {
 
     // Run the app with proper error boundary
     runApp(
-      ProviderScope(
-        // overrides: [sharedPreferencesProvider.overrideWithValue(sharedPrefs)],
-        child: const PropertyManagerApp(),
+      ErrorBoundary(
+        child: ProviderScope(
+          // overrides: [sharedPreferencesProvider.overrideWithValue(sharedPrefs)],
+          child: const PropertyManagerApp(),
+        ),
       ),
     );
   } catch (e) {
-    print('❌ Initialization error: $e');
+    //print('❌ Initialization error: $e');
     runApp(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text('Initialization Error: $e'),
-              ],
+      ErrorBoundary(
+        child: MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Initialization Error: $e'),
+                ],
+              ),
             ),
           ),
         ),
@@ -82,12 +87,12 @@ Future<void> _initializeErrorHandling() async {
   // Handle Flutter framework errors
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    _logError('Flutter Error', details.exception, details.stack);
+    // _logError('Flutter Error', details.exception, details.stack);
   };
 
   // Handle errors outside of Flutter framework
   PlatformDispatcher.instance.onError = (error, stack) {
-    _logError('Platform Error', error, stack);
+    // _logError('Platform Error', error, stack);
     return true;
   };
 }
@@ -96,10 +101,10 @@ Future<void> _initializeErrorHandling() async {
 Future<void> _loadEnvironment() async {
   try {
     await dotenv.load(fileName: ".env");
-    print('✅ Environment variables loaded successfully');
+    //print('✅ Environment variables loaded successfully');
   } catch (e) {
-    print('⚠️ Failed to load .env file: $e');
-    print('📝 Using default configuration values');
+    //print('⚠️ Failed to load .env file: $e');
+    //print('📝 Using default configuration values');
   }
 }
 
@@ -125,9 +130,9 @@ Future<void> _configureSystemUI() async {
 
 /// Log errors with proper formatting
 void _logError(String type, Object error, StackTrace? stackTrace) {
-  print('🚨 $type: $error');
+  //print('🚨 $type: $error');
   if (stackTrace != null) {
-    print('📍 Stack Trace: $stackTrace');
+    //print('📍 Stack Trace: $stackTrace');
   }
 
   // In production, you would send this to crash reporting service
@@ -166,18 +171,26 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
 
       // Mark as initialized
       if (!mounted) return; //
-      setState(() {
-        _isInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+          });
+        }
       });
 
-      print('✅ App initialization completed successfully');
+      //print('✅ App initialization completed successfully');
     } catch (e, stackTrace) {
-      _logError('App Initialization Error', e, stackTrace);
+      // _logError('App Initialization Error', e, stackTrace);
 
       // Still mark as initialized to prevent infinite loading
       if (!mounted) return; //
-      setState(() {
-        _isInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+          });
+        }
       });
     }
   }
@@ -197,19 +210,19 @@ class _PropertyManagerAppState extends ConsumerState<PropertyManagerApp>
 
     switch (state) {
       case AppLifecycleState.resumed:
-        print('📱 App resumed');
+        //print('📱 App resumed');
         break;
       case AppLifecycleState.paused:
-        print('📱 App paused');
+        //print('📱 App paused');
         break;
       case AppLifecycleState.detached:
-        print('📱 App detached');
+        //print('📱 App detached');
         break;
       case AppLifecycleState.inactive:
-        print('📱 App inactive');
+        //print('📱 App inactive');
         break;
       case AppLifecycleState.hidden:
-        print('📱 App hidden');
+        //print('📱 App hidden');
         break;
     }
   }
@@ -295,7 +308,7 @@ class _InitializationScreenState extends State<InitializationScreen>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha:0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),

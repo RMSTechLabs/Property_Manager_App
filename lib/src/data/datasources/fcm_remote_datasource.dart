@@ -20,23 +20,23 @@ abstract class FCMRemoteDataSource {
 class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
   final Dio dio;
   final FirebaseMessaging firebaseMessaging;
-  final Logger logger = Logger(printer: PrettyPrinter());
+  final logger = Logger(printer: PrettyPrinter());
 
   FCMRemoteDataSourceImpl(this.dio, this.firebaseMessaging);
 
   @override
   Future<String?> getFCMToken() async {
     try {
-      logger.i('🔑 Getting FCM token...');
+      //logger.i('🔑 Getting FCM token...');
       final token = await firebaseMessaging.getToken();
       if (token != null) {
-        logger.i('✅ FCM Token received: ${token.substring(0, 50)}...');
+        //logger.i('✅ FCM Token received: ${token.substring(0, 50)}...');
       } else {
-        logger.w('⚠️ FCM Token is null');
+        //logger.w('⚠️ FCM Token is null');
       }
       return token;
     } catch (e) {
-      logger.e('❌ Failed to get FCM token: $e');
+      //logger.e('❌ Failed to get FCM token: $e');
       throw FCMException('Failed to get FCM token: $e');
     }
   }
@@ -44,7 +44,7 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
   @override
   Future<void> registerDevice(String userId, String accessToken) async {
     try {
-      logger.i('📱 Registering device for user: $userId');
+      //logger.i('📱 Registering device for user: $userId');
       
       final fcmToken = await getFCMToken();
       if (fcmToken == null) {
@@ -77,24 +77,24 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        logger.i('✅ Device registered successfully');
+        //logger.i('✅ Device registered successfully');
       } else {
         throw FCMException('Device registration failed with status: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      logger.e('❌ DioException during device registration: ${e.message}');
+      //logger.e('❌ DioException during device registration: ${e.message}');
       if (e.response?.statusCode == 401) {
         throw AuthException('Unauthorized: Invalid access token');
       } else if (e.response?.statusCode == 409) {
         // Device already registered, try to update instead
-        logger.i('🔄 Device already registered, updating token...');
+        //logger.i('🔄 Device already registered, updating token...');
         await updateDeviceToken(userId, await getFCMToken() ?? '', accessToken);
       } else {
         final message = e.response?.data?['message'] ?? 'Device registration failed';
         throw FCMException(message);
       }
     } catch (e) {
-      logger.e('💥 Unexpected error during device registration: $e');
+      //logger.e('💥 Unexpected error during device registration: $e');
       if (e is FCMException || e is AuthException) {
         rethrow;
       }
@@ -105,7 +105,7 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
   @override
   Future<void> updateDeviceToken(String userId, String newToken, String accessToken) async {
     try {
-      logger.i('🔄 Updating FCM token for user: $userId');
+      //logger.i('🔄 Updating FCM token for user: $userId');
       
       final deviceId = await DeviceInfoHelper.getDeviceId();
       
@@ -125,12 +125,12 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        logger.i('✅ FCM token updated successfully');
+        //logger.i('✅ FCM token updated successfully');
       } else {
         throw FCMException('Token update failed with status: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      logger.e('❌ Failed to update FCM token: ${e.message}');
+      //logger.e('❌ Failed to update FCM token: ${e.message}');
       if (e.response?.statusCode == 401) {
         throw AuthException('Unauthorized: Invalid access token');
       } else {
@@ -138,7 +138,7 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
         throw FCMException(message);
       }
     } catch (e) {
-      logger.e('💥 Unexpected error during token update: $e');
+      //logger.e('💥 Unexpected error during token update: $e');
       if (e is FCMException || e is AuthException) {
         rethrow;
       }
@@ -149,7 +149,7 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
   @override
   Future<void> unregisterDevice(String userId, String accessToken) async {
     try {
-      logger.i('🗑️ Unregistering device for user: $userId');
+      //logger.i('🗑️ Unregistering device for user: $userId');
       
       final deviceId = await DeviceInfoHelper.getDeviceId();
       
@@ -168,15 +168,15 @@ class FCMRemoteDataSourceImpl implements FCMRemoteDataSource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        logger.i('✅ Device unregistered successfully');
+        //logger.i('✅ Device unregistered successfully');
       } else {
-        logger.w('⚠️ Device unregistration returned status: ${response.statusCode}');
+        //logger.w('⚠️ Device unregistration returned status: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      logger.e('❌ Failed to unregister device: ${e.message}');
+      //logger.e('❌ Failed to unregister device: ${e.message}');
       // Don't throw error for unregistration failures during logout
     } catch (e) {
-      logger.e('💥 Unexpected error during device unregistration: $e');
+      //logger.e('💥 Unexpected error during device unregistration: $e');
       // Don't throw error for unregistration failures
     }
   }

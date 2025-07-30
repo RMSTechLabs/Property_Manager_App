@@ -38,7 +38,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
         if (data.isEmpty) {
           return [];
         }
-        print(data);
+        //print(data);
         return data.map((json) => NoticeModel.fromJson(json)).toList();
       } else {
         throw Exception('Server error: ${response.statusCode}');
@@ -74,7 +74,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
       }
       return false;
     } on DioException catch (e) {
-      print('Error marking notice as read: ${e.message}');
+      //print('Error marking notice as read: ${e.message}');
       return false;
     }
   }
@@ -98,7 +98,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
       }
       return false;
     } on DioException catch (e) {
-      print('Error toggling notice saved status: ${e.message}');
+      //print('Error toggling notice saved status: ${e.message}');
       return false;
     }
   }
@@ -129,7 +129,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
       }
       return 0;
     } on DioException catch (e) {
-      print('Error getting unread count: ${e.message}');
+      //print('Error getting unread count: ${e.message}');
       return 0;
     }
   }
@@ -161,7 +161,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
       }
       return [];
     } on DioException catch (e) {
-      print('Error getting saved notices: ${e.message}');
+      //print('Error getting saved notices: ${e.message}');
       return [];
     }
   }
@@ -193,7 +193,7 @@ class NoticeNotifier extends AsyncNotifier<List<NoticeModel>> {
       }
       return [];
     } on DioException catch (e) {
-      print('Error getting unread notices: ${e.message}');
+      //print('Error getting unread notices: ${e.message}');
       return [];
     }
   }

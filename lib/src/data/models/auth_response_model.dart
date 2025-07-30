@@ -31,7 +31,7 @@ class AuthResponseModel {
         otpVerified: false,
       );
     } catch (e, stack) {
-      print('❌ Error parsing AuthResponseModel: $e\n$stack');
+      //print('❌ Error parsing AuthResponseModel: $e\n$stack');
       rethrow;
     }
   }

@@ -52,7 +52,7 @@ class NotificationDataSourceImpl implements NotificationDataSource {
       
       // Get and save FCM token
       final token = await _firebaseMessaging.getToken();
-      print('✅FCM Token: $token');
+      //print('✅FCM Token: $token');
       if (token != null) {
         await saveFCMToken(token);
       }
@@ -158,7 +158,7 @@ class NotificationDataSourceImpl implements NotificationDataSource {
 
   static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
     // Handle background message processing
-    print('Background message: ${message.messageId}');
+    //print('Background message: ${message.messageId}');
   }
 
   void _handleMessageTap(RemoteMessage message) {

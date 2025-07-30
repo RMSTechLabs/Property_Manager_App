@@ -14,28 +14,28 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _logger.i(
-      'REQUEST[${options.method}] => PATH: ${options.path} '
-      'DATA: ${options.data} HEADERS: ${options.headers}',
-    );
+    // _logger.i(
+    //   'REQUEST[${options.method}] => PATH: ${options.path} '
+    //   'DATA: ${options.data} HEADERS: ${options.headers}',
+    // );
     super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    _logger.i(
-      'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path} '
-      'DATA: ${response.data}',
-    );
+    // _logger.i(
+    //   'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path} '
+    //   'DATA: ${response.data}',
+    // );
     super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _logger.e(
-      'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path} '
-      'MESSAGE: ${err.message}',
-    );
+    // _logger.e(
+    //   'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path} '
+    //   'MESSAGE: ${err.message}',
+    // );
     super.onError(err, handler);
   }
 }

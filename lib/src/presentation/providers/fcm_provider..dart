@@ -39,7 +39,7 @@ class FCMNotifier extends StateNotifier<FCMState> {
 
   Future<void> _initializeFCM() async {
     try {
-      _logger.i('🔔 Initializing FCM...');
+      // _logger.i('🔔 Initializing FCM...');
       
       // Get initial token
       final token = await _fcmDataSource.getFCMToken();
@@ -48,18 +48,18 @@ class FCMNotifier extends StateNotifier<FCMState> {
       // Listen for token refresh
       _tokenRefreshSubscription = _fcmDataSource.tokenRefreshStream.listen(
         (newToken) {
-          _logger.i('🔄 FCM token refreshed');
+          // _logger.i('🔄 FCM token refreshed');
           state = state.copyWith(currentToken: newToken);
           // You can call API to update token here if user is logged in
         },
         onError: (error) {
-          _logger.e('❌ FCM token refresh error: $error');
+          // _logger.e('❌ FCM token refresh error: $error');
           state = state.copyWith(error: 'Token refresh failed: $error');
         },
       );
       
     } catch (e) {
-      _logger.e('❌ FCM initialization failed: $e');
+      // _logger.e('❌ FCM initialization failed: $e');
       state = state.copyWith(error: 'FCM initialization failed: $e');
     }
   }
@@ -69,7 +69,7 @@ class FCMNotifier extends StateNotifier<FCMState> {
       await _fcmDataSource.registerDevice(userId, accessToken);
       state = state.copyWith(isRegistered: true, error: null);
     } catch (e) {
-      _logger.e('❌ Device registration failed: $e');
+      // _logger.e('❌ Device registration failed: $e');
       state = state.copyWith(error: 'Device registration failed: $e');
     }
   }
@@ -80,7 +80,7 @@ class FCMNotifier extends StateNotifier<FCMState> {
         await _fcmDataSource.updateDeviceToken(userId, state.currentToken!, accessToken);
       }
     } catch (e) {
-      _logger.e('❌ Token update failed: $e');
+      // _logger.e('❌ Token update failed: $e');
       state = state.copyWith(error: 'Token update failed: $e');
     }
   }
@@ -90,7 +90,7 @@ class FCMNotifier extends StateNotifier<FCMState> {
       await _fcmDataSource.unregisterDevice(userId, accessToken);
       state = state.copyWith(isRegistered: false, error: null);
     } catch (e) {
-      _logger.e('❌ Device unregistration failed: $e');
+      // _logger.e('❌ Device unregistration failed: $e');
       // Don't update state with error for unregistration
     }
   }

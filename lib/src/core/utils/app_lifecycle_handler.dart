@@ -34,7 +34,7 @@ class AppLifecycleHandler extends WidgetsBindingObserver {
   }
 
   void _handleAppResumed() {
-    print('App resumed - checking auth state');
+    //print('App resumed - checking auth state');
     
     final authState = ref.read(authStateProvider);
     if (authState.isAuthenticated) {
@@ -44,13 +44,13 @@ class AppLifecycleHandler extends WidgetsBindingObserver {
   }
 
   void _handleAppPaused() {
-    print('App paused - auth state preserved');
+    //print('App paused - auth state preserved');
     // Don't logout when app goes to background
     // Token refresh will continue in background if possible
   }
 
   void _handleAppDetached() {
-    print('App detached - auth state preserved');
+    //print('App detached - auth state preserved');
     // Don't logout when app is terminated
     // User will remain logged in for next app launch
   }

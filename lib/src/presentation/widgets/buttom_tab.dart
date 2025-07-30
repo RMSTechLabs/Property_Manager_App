@@ -9,27 +9,50 @@ class BottomTab extends StatelessWidget {
 
   const BottomTab({super.key, required this.child});
 
+  // int _locationToTabIndex(String location) {
+  //   if (location.startsWith('/settings')) return 1;
+  //   if (location.startsWith('/profile')) return 2;
+  //   return 0;
+  // }
+
   int _locationToTabIndex(String location) {
-    if (location.startsWith('/settings')) return 1;
-    if (location.startsWith('/profile')) return 2;
-    return 0;
-  }
+  // if (location.startsWith('/settings')) return 1;
+  if (location.startsWith('/profile')) return 1; // index shifted
+  return 0;
+}
+
+  // void _onItemTapped(BuildContext context, int index, int currentIndex) {
+  //   if (index == currentIndex) return;
+
+  //   switch (index) {
+  //     case 0:
+  //       context.pushNamed('home');
+  //       break;
+  //     case 1:
+  //       context.pushNamed('settings');
+  //       break;
+  //     case 2:
+  //       context.pushNamed('profile');
+  //       break;
+  //   }
+  // }
 
   void _onItemTapped(BuildContext context, int index, int currentIndex) {
-    if (index == currentIndex) return;
+  if (index == currentIndex) return;
 
-    switch (index) {
-      case 0:
-        context.pushNamed('home');
-        break;
-      case 1:
-        context.pushNamed('settings');
-        break;
-      case 2:
-        context.pushNamed('profile');
-        break;
-    }
+  switch (index) {
+    case 0:
+      context.pushNamed('home');
+      break;
+    // case 1:
+    //   context.pushNamed('settings');
+    //   break;
+    case 1:
+      context.pushNamed('profile'); // now index 1 is profile
+      break;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +91,11 @@ class BottomTab extends StatelessWidget {
               activeIcon: Icon(Icons.home),
               label: 'Home',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings_outlined),
-              activeIcon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.settings_outlined),
+            //   activeIcon: Icon(Icons.settings),
+            //   label: 'Settings',
+            // ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),

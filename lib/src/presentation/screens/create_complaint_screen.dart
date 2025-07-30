@@ -622,30 +622,30 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Voice Recording Button
-            GestureDetector(
-              onTap: () => _recordVoice(),
-              child: Container(
-                width: screenWidth * 0.11,
-                height: screenWidth * 0.11,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.055),
-                  border: Border.all(color: Colors.grey.shade300),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.mic,
-                  color: AppConstants.black,
-                  size: screenWidth * 0.045,
-                ),
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () => _recordVoice(),
+            //   child: Container(
+            //     width: screenWidth * 0.11,
+            //     height: screenWidth * 0.11,
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(screenWidth * 0.055),
+            //       border: Border.all(color: Colors.grey.shade300),
+            //       boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black.withValues(alpha: 0.1),
+            //           blurRadius: 4,
+            //           offset: const Offset(0, 2),
+            //         ),
+            //       ],
+            //     ),
+            //     child: Icon(
+            //       Icons.mic,
+            //       color: AppConstants.black,
+            //       size: screenWidth * 0.045,
+            //     ),
+            //   ),
+            // ),
 
             SizedBox(width: screenWidth * 0.025),
 
@@ -773,24 +773,24 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
                 () => _handleImageSelection(ImageSource.camera),
                 screenWidth,
               ),
-              _buildAttachmentOption(
-                "Take Video",
-                Icons.videocam,
-                () => _handleVideoSelection(ImageSource.camera),
-                screenWidth,
-              ),
+              // _buildAttachmentOption(
+              //   "Take Video",
+              //   Icons.videocam,
+              //   () => _handleVideoSelection(ImageSource.camera),
+              //   screenWidth,
+              // ),
               _buildAttachmentOption(
                 "Add Documents",
                 Icons.folder,
                 () => _handleDocumentSelection(),
                 screenWidth,
               ),
-              _buildAttachmentOption(
-                "Choose from Library",
-                Icons.photo_library,
-                () => _handleImageSelection(ImageSource.gallery),
-                screenWidth,
-              ),
+              // _buildAttachmentOption(
+              //   "Choose from Library",
+              //   Icons.photo_library,
+              //   () => _handleImageSelection(ImageSource.gallery),
+              //   screenWidth,
+              // ),
               SizedBox(height: screenWidth * 0.03),
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -995,8 +995,8 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
   }
 
   void _recordVoice() {
-    print('Record voice message');
-    // TODO: Implement voice recording
+    //print('Record voice message');
+    
   }
 
   void _submitTicket() async {
@@ -1056,7 +1056,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
         "apartmentId": _selectedLocation?.apartmentId,
         // "areaId": _selectedLocation?.areaId,
       };
-      print(complaintData);
+      //print(complaintData);
 
       List<String> filePaths = _selectedFiles.map((file) => file.path).toList();
 
@@ -1065,7 +1065,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
         complaintData,
         filePaths,
       );
-      print(response);
+      //print(response);
       if (response.statusCode == 201) {
         if (mounted) {
           // ScaffoldMessenger.of(context).showSnackBar(

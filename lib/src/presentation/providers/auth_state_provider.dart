@@ -132,7 +132,7 @@
 //         state = state.copyWith(isLoading: false, isInitialized: true);
 //       }
 //     } catch (e) {
-//       print('Auth initialization error: $e');
+//       //print('Auth initialization error: $e');
 //       state = state.copyWith(
 //         isLoading: false,
 //         isInitialized: true,
@@ -263,7 +263,7 @@
 //         _refreshTimer = Timer(refreshDuration, _refreshAccessToken);
 //       }
 //     } catch (e) {
-//       print('Error scheduling token refresh: $e');
+//       //print('Error scheduling token refresh: $e');
 //       // Fallback to periodic refresh
 //       _schedulePeriodicRefresh();
 //     }
@@ -284,7 +284,7 @@
 //     final result = await _refreshTokenUseCase();
 //     await result.fold(
 //       (failure) async {
-//         print('Token refresh failed: ${failure.message}');
+//         //print('Token refresh failed: ${failure.message}');
 
 //         // Check if we still have a valid refresh token
 //         final hasValidRefreshToken = await SecureStorage.hasValidRefreshToken();
@@ -506,7 +506,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         );
       }
     } catch (e) {
-      print('Auth initialization error: $e');
+      //print('Auth initialization error: $e');
       state = state.copyWith(
         step: AuthStep.error,
         isLoading: false,
@@ -689,11 +689,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> _registerFCMToken(String userId, String accessToken) async {
     try {
-      print('🔔 Registering FCM token for user: $userId');
+      //print('🔔 Registering FCM token for user: $userId');
       await _ref.read(fcmProvider.notifier).registerDevice(userId, accessToken);
-      print('✅ FCM token registration completed');
+      //print('✅ FCM token registration completed');
     } catch (e) {
-      print('⚠️ FCM token registration failed: $e');
+      //print('⚠️ FCM token registration failed: $e');
       // Don't fail auth for FCM registration failure
     }
   }
@@ -706,13 +706,13 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> _unregisterFCMToken(String userId, String accessToken) async {
     try {
-      print('🗑️ Unregistering FCM token for user: $userId');
+      //print('🗑️ Unregistering FCM token for user: $userId');
       await _ref
           .read(fcmProvider.notifier)
           .unregisterDevice(userId, accessToken);
-      print('✅ FCM token unregistration completed');
+      //print('✅ FCM token unregistration completed');
     } catch (e) {
-      print('⚠️ FCM token unregistration failed: $e');
+      //print('⚠️ FCM token unregistration failed: $e');
       // Don't fail logout for FCM unregistration failure
     }
   }
@@ -732,7 +732,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         _refreshTimer = Timer(refreshDuration, _refreshAccessToken);
       }
     } catch (e) {
-      print('Error scheduling token refresh: $e');
+      //print('Error scheduling token refresh: $e');
       _schedulePeriodicRefresh();
     }
   }
@@ -741,7 +741,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     try {
       await _ref.read(fcmProvider.notifier).updateToken(userId, accessToken);
     } catch (e) {
-      print('⚠️ FCM token update failed: $e');
+      //print('⚠️ FCM token update failed: $e');
       // Don't fail token refresh for FCM update failure
     }
   }
@@ -760,7 +760,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     final result = await _refreshTokenUseCase();
     await result.fold(
       (failure) async {
-        print('Token refresh failed: ${failure.message}');
+        //print('Token refresh failed: ${failure.message}');
         final hasValidRefreshToken = await SecureStorage.hasValidRefreshToken();
 
         if (!hasValidRefreshToken) {

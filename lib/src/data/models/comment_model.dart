@@ -7,6 +7,7 @@ class CommentModel {
   final String id;
   final String authorName;
   final String authorRole;
+  final String profileUrl;
   final String timestamp;
   final String content;
   final List<String> images;
@@ -20,12 +21,14 @@ class CommentModel {
     required this.content,
     this.images = const [],
     this.isSystemMessage = false,
+    required this.profileUrl,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return CommentModel(
       id: json['id'].toString(),
-      authorName: json['person']?['name'] ?? 'Unknown', //json['authorName'] ?? '',
+      authorName:
+          json['person']?['name'] ?? 'Unknown', //json['authorName'] ?? '',
       authorRole: 'Resident', //json['authorRole'] ?? '',
       timestamp: AppHelper.formatComplaintTimestamp(json['createdAt'] ?? ''),
       content: json['comments'] ?? '',
@@ -33,6 +36,7 @@ class CommentModel {
       images: (json['images'] as List<dynamic>? ?? [])
           .map((image) => image['imageUrl'].toString())
           .toList(),
+      profileUrl: json['person']?['profileUrl'] ?? "",
     );
   }
 
@@ -45,6 +49,7 @@ class CommentModel {
       'content': content,
       'images': images,
       'isSystemMessage': isSystemMessage,
+      'profileUrl': profileUrl,
     };
   }
 
@@ -56,6 +61,7 @@ class CommentModel {
     String? content,
     List<String>? images,
     bool? isSystemMessage,
+    String? profileUrl,
   }) {
     return CommentModel(
       id: id ?? this.id,
@@ -65,6 +71,7 @@ class CommentModel {
       content: content ?? this.content,
       images: images ?? this.images,
       isSystemMessage: isSystemMessage ?? this.isSystemMessage,
+      profileUrl: profileUrl ?? this.profileUrl,
     );
   }
 }

@@ -54,7 +54,7 @@ class SecureStorage {
         return UserModel.fromJson(userData);
       }
     } catch (e) {
-      print('Error reading user data: $e');
+      //print('Error reading user data: $e');
     }
     return null;
   }
@@ -90,7 +90,7 @@ class SecureStorage {
         final timestamp = int.parse(timestampString);
         return DateTime.fromMillisecondsSinceEpoch(timestamp);
       } catch (e) {
-        print('Error parsing last login time: $e');
+        //print('Error parsing last login time: $e');
       }
     }
     return null;

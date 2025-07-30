@@ -61,7 +61,7 @@ class AdvancedRepository {
         },
       ),
       onSendProgress: (int sent, int total) {
-        print('Upload progress: ${(sent / total * 100).toStringAsFixed(0)}%');
+        //print('Upload progress: ${(sent / total * 100).toStringAsFixed(0)}%');
       },
     );
   }
@@ -72,7 +72,7 @@ class AdvancedRepository {
       savePath,
       onReceiveProgress: (int received, int total) {
         if (total != -1) {
-          print('Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+          //print('Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
         }
       },
     );

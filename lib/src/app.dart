@@ -45,10 +45,10 @@ class _AppState extends ConsumerState<App> {
     // 🔔 This will initialize notifications when the app starts
     ref.listen<NotificationState>(notificationProvider, (previous, next) {
       if (next.error != null) {
-        print('❌ Notification error: ${next.error}');
+        //print('❌ Notification error: ${next.error}');
       }
       if (next.fcmToken != null) {
-        print('🎯 FCM Token received in app: ${next.fcmToken}');
+        //print('🎯 FCM Token received in app: ${next.fcmToken}');
       }
     });
 

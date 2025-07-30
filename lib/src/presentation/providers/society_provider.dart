@@ -42,7 +42,7 @@ import 'package:property_manager_app/src/presentation/screens/home_screen.dart';
 //   /// Internal method to load society info using provided email
 //   Future<void> _loadSocietyList(String email) async {
 //     final result = await _communityForResidentUsecase(email);
-//     print('Loading society for email: $result');
+//     //print('Loading society for email: $result');
 //     await result.fold(
 //       (failure) async {
 //         state = state.copyWith(

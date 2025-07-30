@@ -56,7 +56,7 @@ class ComplaintService extends IComplaintService {
       options: Options(headers: {'Content-Type': 'multipart/form-data'}),
     );
 
-    print('Complaint created: ${response.data}');
+    //print('Complaint created: ${response.data}');
     return response;
   }
 

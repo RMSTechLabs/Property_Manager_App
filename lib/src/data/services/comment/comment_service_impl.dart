@@ -57,7 +57,7 @@ class CommentService implements ICommentService {
       options: Options(headers: {'Content-Type': 'multipart/form-data'}),
     );
 
-    print('Comment sent: ${response.data}');
+    //print('Comment sent: ${response.data}');
     return response;
   }
 
