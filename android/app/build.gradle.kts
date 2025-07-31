@@ -42,6 +42,11 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true //Add this line
+
+        // Correct syntax for Kotlin DSL
+        ndk {
+            abiFilters += setOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
 
@@ -55,20 +60,34 @@ android {
     }
 
     buildTypes {
-        release { 
-            getByName("release") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            ndk {
-                debugSymbolLevel = "none"
-            }
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            
+            signingConfig = signingConfigs.getByName("release")
+            
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
+
+            // Add this line to explicitly set symbol handling
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
+
+    // Fixed: Changed from packagingOptions to packaging
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
 
     // ✅ Add this block here:
     buildFeatures {
