@@ -1,7 +1,7 @@
 name: property_manager_app
 description: "Property Manager App is a Flutter application designed to help users manage their properties efficiently. It provides features for tracking property details, expenses, and maintenance schedules."
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.8.1
@@ -116,4 +116,3 @@ flutter_launcher_icons:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
- 

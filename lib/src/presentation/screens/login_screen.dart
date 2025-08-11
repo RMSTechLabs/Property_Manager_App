@@ -1065,19 +1065,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     // Image overlay with reduced opacity
-                    image: DecorationImage(
-                      image: const AssetImage('assets/images/overlay.jpg'),
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                      // Image overlay with transparency
-                      colorFilter: ColorFilter.mode(
-                        Colors.white.withValues(alpha: 0.15), // Very low opacity for subtle overlay
-                        BlendMode.modulate,
-                      ),
-                      onError: (exception, stackTrace) {
-                        // debug//print('Image loading error: $exception');
-                      },
-                    ),
+                    // image: DecorationImage(
+                    //   image: const AssetImage('assets/images/overlay.jpg'),
+                    //   fit: BoxFit.cover,
+                    //   alignment: Alignment.center,
+                    //   // Image overlay with transparency
+                    //   colorFilter: ColorFilter.mode(
+                    //     Colors.white.withValues(alpha: 0.15), // Very low opacity for subtle overlay
+                    //     BlendMode.modulate,
+                    //   ),
+                    //   onError: (exception, stackTrace) {
+                    //     // debug//print('Image loading error: $exception');
+                    //   },
+                    // ),
                   ),
                   // Additional gradient overlay for depth
                   child: Container(

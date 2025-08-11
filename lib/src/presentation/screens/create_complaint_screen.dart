@@ -779,18 +779,18 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
               //   () => _handleVideoSelection(ImageSource.camera),
               //   screenWidth,
               // ),
-              _buildAttachmentOption(
-                "Add Documents",
-                Icons.folder,
-                () => _handleDocumentSelection(),
-                screenWidth,
-              ),
               // _buildAttachmentOption(
-              //   "Choose from Library",
-              //   Icons.photo_library,
-              //   () => _handleImageSelection(ImageSource.gallery),
+              //   "Add Documents",
+              //   Icons.folder,
+              //   () => _handleDocumentSelection(),
               //   screenWidth,
               // ),
+              _buildAttachmentOption(
+                "Choose from Gallery",
+                Icons.photo_library,
+                () => _handleImageSelection(ImageSource.gallery),
+                screenWidth,
+              ),
               SizedBox(height: screenWidth * 0.03),
               TextButton(
                 onPressed: () => Navigator.pop(context),

@@ -1519,6 +1519,8 @@ import 'package:property_manager_app/src/presentation/providers/ticket_detail_pr
 import 'package:property_manager_app/src/presentation/widgets/image_viewer.dart';
 import 'package:redacted/redacted.dart';
 import 'package:property_manager_app/src/presentation/providers/comments_provider.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final String ticketId;
@@ -1827,7 +1829,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
           final imageUrl = images[index];
 
           return Material(
-             color: Colors.transparent,
+            color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () => _openImageViewerFromUrl(
@@ -2165,8 +2167,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   }
 
   Widget _buildCommentItem(CommentModel comment, double screenWidth) {
-
-    final bool hasProfileImage = comment.profileUrl=="" ?false:true;
+    final bool hasProfileImage = comment.profileUrl == "" ? false : true;
     return Container(
       margin: EdgeInsets.only(bottom: screenWidth * 0.04),
       child: Row(
@@ -2288,7 +2289,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                           ),
                           child: Material(
                             color: Colors.transparent,
-                            
+
                             child: InkWell(
                               borderRadius: BorderRadius.circular(8),
                               onTap: () => _openImageViewerFromUrl(
@@ -2665,18 +2666,18 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               //   () => _handleVideoSelection(ImageSource.camera),
               //   screenWidth,
               // ),
-              _buildAttachmentOption(
-                "Add Documents",
-                Icons.folder,
-                () => _handleDocumentSelection(),
-                screenWidth,
-              ),
               // _buildAttachmentOption(
-              //   "Choose from Library",
-              //   Icons.photo_library,
-              //   () => _handleImageSelection(ImageSource.gallery),
+              //   "Add Documents",
+              //   Icons.folder,
+              //   () => _handleDocumentSelection(),
               //   screenWidth,
               // ),
+              _buildAttachmentOption(
+                "Choose from Gallery",
+                Icons.photo_library,
+                () => _handleImageSelection(ImageSource.gallery),
+                screenWidth,
+              ),
               SizedBox(height: screenWidth * 0.03),
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -2758,25 +2759,71 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     }
   }
 
-  Future<void> _handleDocumentSelection() async {
-    if (await _requestPermission(Permission.storage)) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.any,
-      );
+  // Future<void> _handleDocumentSelection() async {
+  //   if (await _requestPermission(Permission.storage)) {
+  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //       allowMultiple: true,
+  //       type: FileType.any,
+  //     );
 
-      if (result != null) {
-        setState(() {
-          _selectedFiles.addAll(
-            result.paths.map((path) => File(path!)).toList(),
-          );
-        });
-      }
+  //     if (result != null) {
+  //       setState(() {
+  //         _selectedFiles.addAll(
+  //           result.paths.map((path) => File(path!)).toList(),
+  //         );
+  //       });
+  //     }
+  //   }
+  // }
+
+  Future<void> _handleDocumentSelection() async {
+    bool hasPermission = await _checkStoragePermission();
+
+    if (!hasPermission) {
+      return;
     }
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedFiles.addAll(
+          result.paths.whereType<String>().map((path) => File(path)).toList(),
+        );
+      });
+    }
+  }
+
+  Future<bool> _checkStoragePermission() async {
+    if (Platform.isAndroid) {
+      int sdkInt = await _getAndroidSdkInt();
+
+      if (sdkInt <= 29) {
+        var status = await Permission.storage.request();
+        if (status.isGranted) return true;
+        _showPermissionDialog(Permission.storage);
+        return false;
+      }
+      // For Android 11+ no storage permission needed for picking
+      return true;
+    }
+    // iOS/macOS doesn’t require manual storage permissions for picker
+    return true;
+  }
+
+  Future<int> _getAndroidSdkInt() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt;
   }
 
   Future<bool> _requestPermission(Permission permission) async {
     final status = await permission.request();
+
     if (status.isDenied) {
       _showPermissionDialog(permission);
       return false;
