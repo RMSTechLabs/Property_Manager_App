@@ -1,5 +1,4 @@
-package com.example.property_manager_app
-
+package com.propertymanageruae
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()

@@ -167,11 +167,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
       ),
+
+      // GoRoute(
+      //   path: '/edit-profile/:memberId',
+      //   builder: (context, state) {
+      //     final memberId = state.pathParameters['memberId']!;
+      //     final initialProfile = state.extra as UserProfileDataModel?;
+      //     return EditProfileScreen(
+      //       memberId: memberId,
+      //       initialProfile: initialProfile,
+      //     );
+      //   },
+      // ),
+      // In your router configuration file
       GoRoute(
         path: '/edit-profile/:memberId',
         builder: (context, state) {
           final memberId = state.pathParameters['memberId']!;
-          final initialProfile = state.extra as UserProfileDataModel?;
+
+          // Handle both UserProfileDataModel and Map<String, dynamic>
+          UserProfileDataModel? initialProfile;
+
+          if (state.extra != null) {
+            if (state.extra is UserProfileDataModel) {
+              initialProfile = state.extra as UserProfileDataModel;
+            } else if (state.extra is Map<String, dynamic>) {
+              // Convert Map to UserProfileDataModel
+              initialProfile = UserProfileDataModel.fromJson(
+                state.extra as Map<String, dynamic>,
+              );
+            }
+          }
+
           return EditProfileScreen(
             memberId: memberId,
             initialProfile: initialProfile,
